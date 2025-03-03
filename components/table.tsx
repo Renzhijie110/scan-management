@@ -36,8 +36,14 @@ export default function Table() {
     }
 
     try {
-      const response = await fetch(`/api/boxes/${boxId}`, {
-        method: 'DELETE',
+      const response = await fetch('/api/boxes/delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          box_id: boxId,
+        }),
       });
 
       if (response.ok) {
@@ -46,6 +52,7 @@ export default function Table() {
         setError('删除失败');
       }
     } catch (error) {
+      console.error('Error:', error);
       setError('删除失败，请稍后重试');
     }
   };

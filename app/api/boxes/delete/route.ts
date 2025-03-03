@@ -4,13 +4,17 @@ import { NextRequest } from 'next/server';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { box_id: string } }
-) {
+export async function POST(request: NextRequest) {
   try {
-    const box_id = params.box_id;
+    const { box_id } = await request.json();
     
+    if (!box_id) {
+      return NextResponse.json(
+        { error: 'Box ID is required' },
+        { status: 400 }
+      );
+    }
+
     // 先删除 scan_records 表中的记录
     await sql`
       DELETE FROM scan_records WHERE box_id = ${box_id}
