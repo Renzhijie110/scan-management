@@ -4,12 +4,11 @@ const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' })
 
 export async function seed() {
   const createTable = await sql`
-    CREATE TABLE IF NOT EXISTS profiles (
+    CREATE TABLE IF NOT EXISTS scans (
       id SERIAL PRIMARY KEY,
-      name VARCHAR(255) NOT NULL,
-      email VARCHAR(255) UNIQUE NOT NULL,
-      image VARCHAR(255),
-      "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      item_id VARCHAR(255) UNIQUE NOT NULL,
+      "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+      
     );
     `
 
