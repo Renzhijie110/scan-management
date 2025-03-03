@@ -61,3 +61,13 @@ export async function deleteScanRecord(scan_id: number) {
     DELETE FROM Scan_Records WHERE scan_id = ${scan_id};
   `;
 }
+
+// Update box timestamp
+export async function updateBoxTimestamp(box_id: string) {
+  await sql`
+    UPDATE Boxes 
+    SET updated_at = CURRENT_TIMESTAMP
+    WHERE box_id = ${box_id};
+  `;
+}
+

@@ -1,27 +1,26 @@
-import './globals.css'
-import { Inter } from 'next/font/google'
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
+import Navbar from '@/components/navbar';
 
-export const metadata = {
-  metadataBase: new URL('https://postgres-starter.vercel.app'),
-  title: 'Postgres Demo',
-  description:
-    'A simple Next.js app with a Postgres database',
-}
+const inter = Inter({ subsets: ['latin'] });
 
-const inter = Inter({
-  variable: '--font-inter',
-  subsets: ['latin'],
-  display: 'swap',
-})
+export const metadata: Metadata = {
+  title: '物品追踪系统',
+  description: '物品追踪管理系统',
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.variable}>{children}</body>
+    <html lang="zh">
+      <body className={inter.className}>
+        <Navbar />
+        {children}
+      </body>
     </html>
-  )
+  );
 }
