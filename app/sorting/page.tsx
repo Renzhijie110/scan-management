@@ -18,9 +18,6 @@ export default function SortingPage() {
         aspectRatio: 1.0,
         showTorchButtonIfSupported: true,
         showZoomSliderIfSupported: true,
-        supportedScanTypes: [
-          Html5QrcodeScanType.SCAN_TYPE_CAMERA
-        ],
         rememberLastUsedCamera: true,
         preferredCamera: "environment"
       },
