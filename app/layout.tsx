@@ -1,14 +1,10 @@
-import type { Metadata } from 'next';
+'use client';
+
 import { Inter } from 'next/font/google';
 import './globals.css';
-import Navbar from '@/components/navbar';
+import NavWrapper from '@/components/nav-wrapper';
 
 const inter = Inter({ subsets: ['latin'] });
-
-export const metadata: Metadata = {
-  title: '物品追踪系统',
-  description: '物品追踪管理系统',
-};
 
 export default function RootLayout({
   children,
@@ -18,7 +14,7 @@ export default function RootLayout({
   return (
     <html lang="zh">
       <body className={inter.className}>
-        <Navbar />
+        <NavWrapper />
         {children}
       </body>
     </html>

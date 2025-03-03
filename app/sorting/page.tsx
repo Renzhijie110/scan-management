@@ -15,6 +15,14 @@ export default function SortingPage() {
       {
         fps: 10,
         qrbox: { width: 250, height: 250 },
+        aspectRatio: 1.0,
+        showTorchButtonIfSupported: true,
+        showZoomSliderIfSupported: true,
+        supportedScanTypes: [
+          Html5QrcodeScanType.SCAN_TYPE_CAMERA
+        ],
+        rememberLastUsedCamera: true,
+        preferredCamera: "environment"
       },
       false
     );
@@ -52,7 +60,6 @@ export default function SortingPage() {
       if (response.ok) {
         setStatus('success');
         setMessage('分拣扫描成功');
-        // 3秒后返回列表页
         setTimeout(() => {
           router.push('/');
         }, 3000);
