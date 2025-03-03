@@ -4,12 +4,18 @@ import { NextRequest } from 'next/server';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
+type RouteContext = {
+  params: {
+    box_id: string;
+  };
+};
+
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { box_id: string } }
+  context: RouteContext
 ) {
   try {
-    const box_id = params.box_id;
+    const box_id = context.params.box_id;
     
     // 先删除 scan_records 表中的记录
     await sql`
