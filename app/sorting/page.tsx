@@ -18,8 +18,7 @@ export default function SortingPage() {
         aspectRatio: 1.0,
         showTorchButtonIfSupported: true,
         showZoomSliderIfSupported: true,
-        rememberLastUsedCamera: true,
-        preferredCamera: "environment"
+        rememberLastUsedCamera: true
       },
       false
     );
