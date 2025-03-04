@@ -51,10 +51,10 @@ export default function DriverPage() {
 
       if (response.ok) {
         setStatus('success');
-        setMessage('配送扫描成功');
+        setMessage(`${itemId}配送扫描成功`);
         // 3秒后返回列表页
         setTimeout(() => {
-          router.push('/');
+          router.push('/driver');
         }, 3000);
       } else {
         throw new Error('扫描失败');

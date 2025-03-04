@@ -55,9 +55,9 @@ export default function SortingPage() {
 
       if (response.ok) {
         setStatus('success');
-        setMessage('分拣扫描成功');
+        setMessage(`${itemId}分拣扫描成功`);
         setTimeout(() => {
-          router.push('/');
+          router.push('/sorting');
         }, 3000);
       } else {
         throw new Error('扫描失败');
