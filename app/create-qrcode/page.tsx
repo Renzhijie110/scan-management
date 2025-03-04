@@ -7,6 +7,7 @@ import QRCode from 'qrcode';
 export default function CreateQRCode() {
   const [qrCode, setQrCode] = useState<string>('');
   const [itemId, setItemId] = useState<string>('');
+  const [createdAt, setCreatedAt] = useState<string>('');
   const [error, setError] = useState<string>('');
 
   const handlePrint = () => {
@@ -17,12 +18,15 @@ export default function CreateQRCode() {
           <head>
             <title>打印二维码</title>
             <style>
-              body { display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+              body { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
               img { max-width: 100%; }
+              p { margin-top: 10px; font-size: 14px; color: #333; }
             </style>
           </head>
           <body>
             <img src="${qrCode}" alt="QR Code" />
+            <p>物品ID: ${itemId}</p>
+            <p>创建时间: ${createdAt}</p>
           </body>
         </html>
       `);
@@ -37,8 +41,8 @@ export default function CreateQRCode() {
     try {
       const data = `https://scan-management.vercel.app/track?item_id=${itemId}`;
       const qrImage = await QRCode.toDataURL(data);
-      
-      // 只存储网址而不是整个二维码图片
+      const timestamp = new Date().toLocaleString();
+
       const response = await fetch('/api/boxes', {
         method: 'POST',
         headers: {
@@ -46,7 +50,8 @@ export default function CreateQRCode() {
         },
         body: JSON.stringify({
           box_id: itemId,
-          qr_code: data,  // 存储网址而不是二维码图片
+          qr_code: data,
+          created_at: timestamp,
         }),
       });
 
@@ -54,11 +59,13 @@ export default function CreateQRCode() {
         throw new Error('Failed to save box data');
       }
       
-      setQrCode(qrImage);  // 仍然显示二维码图片
+      setQrCode(qrImage);
+      setCreatedAt(timestamp);
       setError('');
     } catch (err) {
       setError('二维码生成失败');
       setQrCode('');
+      setCreatedAt('');
       console.error('Error:', err);
     }
   };
@@ -94,10 +101,11 @@ export default function CreateQRCode() {
         )}
 
         {qrCode && (
-          <div className="mt-6">
+          <div className="mt-6 text-center">
             <h2 className="text-xl font-semibold mb-2">二维码生成成功</h2>
             <img src={qrCode} alt="QR Code" className="mx-auto" />
-            <p className="text-center mt-2 text-gray-600">请将二维码保存或打印到产品上</p>
+            <p className="text-gray-600 mt-2">物品ID: {itemId}</p>
+            <p className="text-gray-600">创建时间: {createdAt}</p>
             <button
               onClick={handlePrint}
               className="mt-4 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"

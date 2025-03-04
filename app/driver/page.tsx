@@ -51,7 +51,7 @@ export default function DriverPage() {
 
       if (response.ok) {
         setStatus('success');
-        setMessage(`${itemId}配送扫描成功`);
+        setMessage(`${itemId}司机扫描成功`);
         // 3秒后返回列表页
         setTimeout(() => {
           router.push('/driver');
@@ -68,7 +68,7 @@ export default function DriverPage() {
   return (
     <main className="min-h-screen p-8">
       <div className="max-w-md mx-auto">
-        <h1 className="text-2xl font-bold mb-6">配送扫描</h1>
+        <h1 className="text-2xl font-bold mb-6">司机扫描</h1>
         
         <div className="bg-white rounded-lg shadow p-6">
           <div className="mb-4">
