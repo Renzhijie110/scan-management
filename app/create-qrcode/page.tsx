@@ -20,13 +20,14 @@ export default function CreateQRCode() {
             <style>
               body { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
               img { max-width: 100%; }
-              p { margin-top: 10px; font-size: 14px; color: #333; }
+              p { margin-top: 10px; font-size: 60px; color: #333; } /* 调整字体大小 */
+              .highlight1 { font-size: 320px; font-weight: bold; } /* 特定部分增大 */
+              .highlight2 { font-size: 150px; font-weight: bold; } /* 特定部分增大 */
             </style>
           </head>
           <body>
-            <img src="${qrCode}" alt="QR Code" />
-            <p>物品ID: ${itemId}</p>
-            <p>创建时间: ${createdAt}</p>
+            <p>G-ID: ${itemId.slice(0, 6)}<br/><span class="highlight1">${itemId.slice(6,10)}</span><br/><span class="highlight2">${itemId.slice(10)}</span>  <img src="${qrCode}" alt="QR Code" /></p>
+
           </body>
         </html>
       `);
@@ -90,30 +91,31 @@ export default function CreateQRCode() {
         </div>
 
         <button
-          onClick={generateQRCode}
-          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-        >
-          生成二维码
-        </button>
+            onClick={generateQRCode}
+            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+          >
+            生成二维码
+          </button>
 
-        {error && (
-          <p className="text-red-500 mt-4">{error}</p>
-        )}
+          {error && (
+            <p className="text-red-500 mt-4">{error}</p>
+          )}
 
-        {qrCode && (
-          <div className="mt-6 text-center">
-            <h2 className="text-xl font-semibold mb-2">二维码生成成功</h2>
-            <img src={qrCode} alt="QR Code" className="mx-auto" />
-            <p className="text-gray-600 mt-2">物品ID: {itemId}</p>
-            <p className="text-gray-600">创建时间: {createdAt}</p>
-            <button
-              onClick={handlePrint}
-              className="mt-4 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
-            >
-              打印二维码
-            </button>
-          </div>
-        )}
+          {qrCode && (
+            <div className="mt-6 text-center">
+              <h2 className="text-2xl font-semibold mb-2">二维码生成成功</h2>
+              <img src={qrCode} alt="QR Code" className="mx-auto" />
+              <p className="text-gray-600 mt-2">物品ID: {itemId}</p>
+              <p className="text-gray-600">创建时间: {createdAt}</p>
+              <button
+                onClick={handlePrint}
+                className="mt-4 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
+              >
+                打印二维码
+              </button>
+            </div>
+          )}
+
       </div>
     </main>
   );
