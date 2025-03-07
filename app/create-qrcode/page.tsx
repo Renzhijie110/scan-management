@@ -39,6 +39,16 @@ export default function CreateQRCode() {
   };
 
   const generateQRCode = async () => {
+    if (!itemId) {
+      setError('物品ID不能为空');
+      return;
+    }
+    const regex = /^\d{6} [A-Z]{3} [A-Za-z0-9\-]+$/;
+    if (!regex.test(itemId)) {
+      setError('GID格式不正确,需要YYMMDD JFK RXX');
+      return;
+    }
+
     try {
       const data = `https://scan-management.vercel.app/track?item_id=${itemId}`;
       const qrImage = await QRCode.toDataURL(data);
@@ -106,7 +116,6 @@ export default function CreateQRCode() {
               <h2 className="text-2xl font-semibold mb-2">二维码生成成功</h2>
               <img src={qrCode} alt="QR Code" className="mx-auto" />
               <p className="text-gray-600 mt-2">物品ID: {itemId}</p>
-              <p className="text-gray-600">创建时间: {createdAt}</p>
               <button
                 onClick={handlePrint}
                 className="mt-4 bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
