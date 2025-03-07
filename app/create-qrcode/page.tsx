@@ -40,12 +40,12 @@ export default function CreateQRCode() {
 
   const generateQRCode = async () => {
     if (!itemId) {
-      setError('物品ID不能为空');
+      setError('GID不能为空 :>');
       return;
     }
     const regex = /^\d{6} [A-Z]{3} [A-Za-z0-9\-]+$/;
     if (!regex.test(itemId)) {
-      setError('GID格式不正确,需要YYMMDD JFK RXX');
+      setError('GID格式不正确,需要YYMMDD JFK RXX :)');
       return;
     }
 
