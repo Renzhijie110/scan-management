@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 
-
 export default function Table() {
   const [boxes, setBoxes] = useState<any[]>([]);
   const [filteredBoxes, setFilteredBoxes] = useState<any[]>([]);
@@ -10,6 +9,10 @@ export default function Table() {
   const [selectedBoxes, setSelectedBoxes] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // 分页状态
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10; // 每页显示的条数
 
   const fetchBoxes = async () => {
     try {
@@ -36,10 +39,11 @@ export default function Table() {
   }, []);
 
   useEffect(() => {
-    const filtered = boxes.filter(box => 
+    const filtered = boxes.filter(box =>
       box.box_id.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredBoxes(filtered);
+    setCurrentPage(1); // 搜索时重置到第一页
   }, [searchQuery, boxes]);
 
   const toggleSelectBox = (boxId: string) => {
@@ -55,10 +59,10 @@ export default function Table() {
   };
 
   const toggleSelectAll = () => {
-    if (selectedBoxes.size === filteredBoxes.length) {
+    if (selectedBoxes.size === currentItems.length) {
       setSelectedBoxes(new Set());
     } else {
-      setSelectedBoxes(new Set(filteredBoxes.map(box => box.box_id)));
+      setSelectedBoxes(new Set(currentItems.map(box => box.box_id)));
     }
   };
 
@@ -87,6 +91,13 @@ export default function Table() {
       setError('删除失败，请稍后重试');
     }
   };
+
+  // 计算分页数据
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredBoxes.slice(indexOfFirstItem, indexOfLastItem);
+
+  const totalPages = Math.ceil(filteredBoxes.length / itemsPerPage);
 
   if (loading) {
     return <div className="text-center p-4">加载中...</div>;
@@ -124,7 +135,7 @@ export default function Table() {
         onClick={toggleSelectAll}
         className="mb-4 px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300"
       >
-        {selectedBoxes.size === filteredBoxes.length ? '取消全选' : '全选'}
+        {selectedBoxes.size === currentItems.length ? '取消全选' : '全选'}
       </button>
       <button
         onClick={handleDeleteSelected}
@@ -132,13 +143,13 @@ export default function Table() {
       >
         删除选中
       </button>
+      
       <div className="divide-y divide-gray-900/5">
-        {filteredBoxes.map((box) => (
+        {currentItems.map((box) => (
           <div key={box.box_id} className="flex items-center justify-between py-3">
             <div className="flex items-center space-x-5">
               <input
                 type="checkbox"
-                
                 checked={selectedBoxes.has(box.box_id)}
                 onChange={() => toggleSelectBox(box.box_id)}
               />
@@ -160,6 +171,25 @@ export default function Table() {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* 分页控制 */}
+      <div className="flex justify-center items-center mt-4 space-x-2">
+        <button
+          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+          className="px-3 py-2 bg-gray-200 rounded-md hover:bg-gray-300 disabled:opacity-50"
+        >
+          上一页
+        </button>
+        <span>{currentPage} / {totalPages}</span>
+        <button
+          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+          disabled={currentPage === totalPages}
+          className="px-3 py-2 bg-gray-200 rounded-md hover:bg-gray-300 disabled:opacity-50"
+        >
+          下一页
+        </button>
       </div>
     </div>
   );
