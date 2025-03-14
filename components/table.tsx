@@ -115,7 +115,7 @@ export default function Table() {
   }
 
   return (
-    <div className="bg-white/30 p-12 shadow-xl ring-1 ring-gray-900/5 rounded-lg backdrop-blur-lg max-w-5xl mx-auto w-full">
+    <div className="bg-white/50 p-8 shadow-xl ring-1 ring-gray-900/5 rounded-lg backdrop-blur-lg max-w-7xl mx-auto w-full">
       <div className="flex justify-between items-center mb-4">
         <div className="space-y-1">
           <h2 className="text-xl font-semibold">物品列表</h2>
@@ -155,18 +155,22 @@ export default function Table() {
               />
               <p className="font-medium">BOX ID: {box.box_id}</p>
             </div>
-            <div className="flex items-center space-x-8">
-              <div className="text-right min-w-[180px]">
+            <div className="flex items-center space-x-10">
+              <div className="text-right min-w-[220px]">
                 <p className="text-sm font-medium text-gray-500">分拣扫描时间</p>
                 <p className="text-sm text-gray-500">{box.sorting_time ? new Date(box.sorting_time).toLocaleString() : 'Unscanned'}</p>
               </div>
-              <div className="text-right min-w-[180px]">
+              <div className="text-right min-w-[220px]">
                 <p className="text-sm font-medium text-gray-500">司机扫描时间</p>
                 <p className="text-sm text-gray-500">{box.driver_time ? new Date(box.driver_time).toLocaleString() : 'Unscanned'}</p>
               </div>
-              <div className="text-right min-w-[180px]">
+              <div className="text-right min-w-[220px]">
                 <p className="text-sm font-medium text-gray-500">创建时间</p>
                 <p className="text-sm text-gray-500">{box.created_at ? new Date(box.created_at).toLocaleString() : 'Unscanned'}</p>
+              </div>
+              <div className="text-right min-w-[150px]">
+                <p className="text-sm font-medium text-gray-500">分拣仓库</p>
+                <p className="text-sm text-gray-500">{box.warehouse}</p>
               </div>
             </div>
           </div>

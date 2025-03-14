@@ -6,9 +6,9 @@ const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
 export async function POST(request: Request) {
   try {
-    const { box_id, qr_code } = await request.json();
+    const { box_id, qr_code, user_id } = await request.json();
     
-    await createBox(box_id, qr_code);
+    await createBox(box_id, qr_code, user_id);
     
     return NextResponse.json({ success: true });
   } catch (error) {
@@ -26,11 +26,14 @@ export async function GET() {
       SELECT 
         b.box_id,
         b.created_at,
+        b.user_id,
+        u.warehouse,
         MAX(CASE WHEN sr.scan_type = 'sorting' THEN sr.scan_time END) as sorting_time,
         MAX(CASE WHEN sr.scan_type = 'driver' THEN sr.scan_time END) as driver_time
       FROM boxes b
+      LEFT JOIN users u ON b.user_id = u.user_id
       LEFT JOIN scan_records sr ON b.box_id = sr.box_id
-      GROUP BY b.box_id, b.created_at
+      GROUP BY b.box_id, b.created_at, b.user_id, u.warehouse
       ORDER BY b.created_at DESC
     `;
     

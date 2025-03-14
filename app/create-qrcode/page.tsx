@@ -1,10 +1,21 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import QRCode from 'qrcode';
+import { useRouter } from 'next/navigation';
+
 
 export default function CreateQRCode() {
+  const router = useRouter();
+  useEffect(() => {
+    const warehouse = localStorage.getItem('warehouse');
+    if (warehouse !== 'JFK' && warehouse !== 'EWR') {
+      router.push('/'); // 强制跳转回登录页
+  }
+
+  }, []);
+
   const [qrCode, setQrCode] = useState<string>('');
   const [itemId, setItemId] = useState<string>('');
   const [createdAt, setCreatedAt] = useState<string>('');
@@ -53,7 +64,7 @@ export default function CreateQRCode() {
       const data = `https://scan-management.vercel.app/track?item_id=${itemId}`;
       const qrImage = await QRCode.toDataURL(data);
       const timestamp = new Date().toLocaleString();
-
+      const user_id = localStorage.getItem('user_id')
       const response = await fetch('/api/boxes', {
         method: 'POST',
         headers: {
@@ -63,6 +74,7 @@ export default function CreateQRCode() {
           box_id: itemId,
           qr_code: data,
           created_at: timestamp,
+          user_id: user_id
         }),
       });
 

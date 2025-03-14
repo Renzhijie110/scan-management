@@ -5,7 +5,7 @@ import Navbar from './navbar';
 
 export default function NavWrapper() {
   const pathname = usePathname();
-  const hideNavbar = pathname?.includes('/track')
+  const hideNavbar = pathname?.includes('/track') || pathname === '/';
 
   return !hideNavbar ? <Navbar /> : null;
-} 
+}
