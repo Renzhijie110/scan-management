@@ -57,15 +57,23 @@ export default function CreateQRCode() {
   };
 
   const handlePrint = () => {
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      printWindow.document.write(`
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'absolute';
+    iframe.style.width = '0px';
+    iframe.style.height = '0px';
+    iframe.style.border = 'none';
+    document.body.appendChild(iframe);
+  
+    const doc = iframe.contentWindow?.document;
+    if (doc) {
+      doc.open();
+      doc.write(`
         <html>
           <head>
             <title>打印二维码</title>
             <style>
               @media print {
-                .qr-container { page-break-before: always; } /* 每个二维码强制新页 */
+                .qr-container { page-break-before: always; }
               }
               body { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
               img { max-width: 100%; }
@@ -80,18 +88,20 @@ export default function CreateQRCode() {
                 <p>G-ID: ${qr.itemId.slice(0, 6)}<br/>
                   <span class="highlight1">${qr.itemId.slice(6,10)}</span><br/>
                   <span class="highlight2">${qr.itemId.slice(10)}</span>
-                                  
                   <img src="${qr.qrImage}" alt="QR Code" />
                 </p>
-
               </div>
             `).join('')}
           </body>
         </html>
       `);
-      printWindow.document.close();
-      printWindow.onload = () => printWindow.print();
+      doc.close();
+  
+      iframe.contentWindow?.focus();
+      iframe.contentWindow?.print();
+      document.body.removeChild(iframe);
     }
+
   };
 
   return (
