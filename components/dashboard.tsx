@@ -31,19 +31,25 @@ export default function Dashboard() {
   const updateNote = async (date: string, note: string) => {
     try {
       const response = await fetch(`/api/dashboard/${date}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ note })
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ note }),
       });
+  
       if (response.ok) {
-        setDashboard(prev => prev.map(item => item.date === date ? { ...item, note } : item));
-        setFilteredDashboard(prev => prev.map(item => item.date === date ? { ...item, note } : item));
+        setDashboard(prev => 
+          prev.map(item => (item.date === date ? { ...item, note } : item))
+        );
+        setFilteredDashboard(prev => 
+          prev.map(item => (item.date === date ? { ...item, note } : item))
+        );
         setEditingNote(null);
       } else {
-        setError('更新失败');
+        setError("更新失败");
       }
     } catch (error) {
-      setError('网络错误，请稍后重试');
+      console.error("Error updating note:", error);
+      setError("网络错误，请稍后重试");
     }
   };
 

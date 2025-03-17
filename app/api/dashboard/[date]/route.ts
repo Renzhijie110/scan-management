@@ -3,13 +3,13 @@ import postgres from 'postgres';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
-export async function PUT(request: NextRequest, context: { params: { date: any } }) {
+export async function PUT(request: NextRequest, context: { params: { date: string } }) {
   try {
     const { note } = await request.json();
-    const { date } = await context.params; // ⚠️ 这里需要 await
+    const { date } = context.params; 
 
     if (!date || note === undefined) {
-      return NextResponse.json({ error: '缺少必要参数' }, { status: 400 });
+      return NextResponse.json({ error: "缺少必要参数" }, { status: 400 });
     }
 
     await sql`
@@ -20,7 +20,7 @@ export async function PUT(request: NextRequest, context: { params: { date: any }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error updating note:', error);
-    return NextResponse.json({ error: 'Failed to update note' }, { status: 500 });
+    console.error("Error updating note:", error);
+    return NextResponse.json({ error: "Failed to update note" }, { status: 500 });
   }
 }
