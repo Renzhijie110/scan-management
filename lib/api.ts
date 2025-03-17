@@ -4,11 +4,12 @@ const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' })
 // Create a new box
 export async function createBox(box_id: string, qr_code: string, user_id: string) {
   await sql`
-    INSERT INTO Boxes (box_id, qr_code,user_id)
+    INSERT INTO "boxes" (box_id, qr_code, user_id)
     VALUES (${box_id}, ${qr_code}, ${user_id})
-    ON CONFLICT (box_id) DO NOTHING;
+    ON CONFLICT (box_id, user_id) DO NOTHING;
   `;
 }
+
 
 // Read a box by ID
 export async function getBox(box_id: string) {

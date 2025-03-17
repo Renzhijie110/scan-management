@@ -146,7 +146,7 @@ export default function Table() {
       
       <div className="divide-y divide-gray-900/5">
         {currentItems.map((box) => (
-          <div key={box.box_id} className="flex items-center justify-between py-3">
+          <div key={`${box.box_id}-${box.user_id}`} className="flex items-center justify-between py-3">
             <div className="flex items-center space-x-5">
               <input
                 type="checkbox"

@@ -30,7 +30,7 @@ export default function Home() {
       }else{
         localStorage.setItem('user_id', data.user_id);
         localStorage.setItem('warehouse', data.warehouse);
-        router.push('/boxes');
+        router.push('/dashboard');
       }
 
     } catch (error) {

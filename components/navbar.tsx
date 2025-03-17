@@ -15,6 +15,16 @@ export default function Navbar() {
                 物品追踪系统
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+            <Link
+                href="/dashboard"
+                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                  pathname === '/dashboard'
+                    ? 'border-blue-500 text-gray-900'
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                }`}
+              >
+                仪表盘
+              </Link>
               <Link
                 href="/boxes"
                 className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${

@@ -7,14 +7,20 @@ const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 export async function POST(request: Request) {
   try {
     const { box_id, qr_code, user_id } = await request.json();
-    
+    console.log('Received data:', { box_id, qr_code, user_id });
+
+    // Calling the createBox function
     await createBox(box_id, qr_code, user_id);
-    
+
+    console.log('Box created successfully');
     return NextResponse.json({ success: true });
   } catch (error) {
+    // Log the full error for debugging
     console.error('Error:', error);
+
+    // Returning a 500 error response with the message
     return NextResponse.json(
-      { error: 'Failed to create box' },
+      { error: 'Failed to create box', message: error},
       { status: 500 }
     );
   }
