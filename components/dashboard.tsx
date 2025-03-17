@@ -75,62 +75,71 @@ export default function Dashboard() {
     <div className="bg-white p-8 shadow-lg rounded-lg max-w-6xl mx-auto w-full">
       <h2 className="text-3xl font-semibold mb-6 text-gray-800">Dashboard</h2>
       <div className="divide-y divide-gray-300">
-        {filteredDashboard.map((item) => (
-          <div key={`${item.date}-${item.orig_warehouse}`} className="py-6">
-            <div className="flex justify-between items-center mb-4">
-              <p className="text-xl font-semibold text-gray-800">{item.date}</p>
-              <div className="grid grid-cols-6 gap-6 text-right">
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Orig Warehouse</p>
-                  <p className="text-lg font-semibold text-gray-700">{item.orig_warehouse}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Dest Warehouse</p>
-                  <p className="text-lg font-semibold text-gray-700">{item.dest_warehouse}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Sorting Scanned</p>
-                  <p className="text-lg font-semibold text-gray-700">{item.sorting_count}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500">Driver Scanned</p>
-                  <p className="text-lg font-semibold text-gray-700">{item.driver_count}</p>
-                </div>
-                <div className="flex justify-between items-center">
-              <div className="w-full">
-                <p className="text-sm font-medium text-gray-500">Actual Pallet</p>
-                {editingNote?.date === item.date ? (
-                  <input
-                    type="text"
-                    value={editingNote?.note ?? ''}
-                    onChange={(e) => {
-                      if (editingNote) {
-                        setEditingNote({ ...editingNote, note: e.target.value });
-                      }
-                    }}
-                    onBlur={() => {
-                      if (editingNote) {
-                        updateNote(item.date, editingNote.note);
-                      }
-                    }}
-                    className="text-lg text-gray-700 border rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                    autoFocus
-                  />
-                ) : (
-                  <p
-                    className="text-lg text-gray-700 cursor-pointer hover:text-blue-600 transition"
-                    onClick={() => setEditingNote({ date: item.date, note: item.note })}
-                  >
-                    {item.note || 'Click to Edit'}
-                  </p>
-                )}
-              </div>
-            </div>
-              </div>
-            </div>
+        {filteredDashboard.map((item) => {
+          const isMismatch = item.note && Number(item.sorting_count) !== Number(item.note);
 
-          </div>
-        ))}
+          return (
+            <div key={`${item.date}-${item.orig_warehouse}`} className="py-6">
+              <div className="flex justify-between items-center mb-4">
+                <p className="text-xl font-semibold text-gray-800">{item.date}</p>
+                <div className="grid grid-cols-6 gap-6 text-right">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Orig Warehouse</p>
+                    <p className="text-lg font-semibold text-gray-700">{item.orig_warehouse}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Dest Warehouse</p>
+                    <p className="text-lg font-semibold text-gray-700">{item.dest_warehouse}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Sorting Scanned</p>
+                    <p className={`text-lg font-semibold ${isMismatch ? 'text-red-500' : 'text-gray-700'}`}>
+                      {item.sorting_count}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">Driver Scanned</p>
+                    <p className="text-lg font-semibold text-gray-700">{item.driver_count}</p>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <div className="w-full">
+                      <p className="text-sm font-medium text-gray-500">Actual Pallet</p>
+                      {editingNote?.date === item.date ? (
+                        <input
+                          type="text"
+                          value={editingNote?.note ?? ''}
+                          onChange={(e) => {
+                            if (editingNote) {
+                              setEditingNote({ ...editingNote, note: e.target.value });
+                            }
+                          }}
+                          onBlur={() => {
+                            if (editingNote) {
+                              updateNote(item.date, editingNote.note);
+                            }
+                          }}
+                          className={`text-lg border rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition ${
+                            isMismatch ? 'text-red-500' : 'text-gray-700'
+                          }`}
+                          autoFocus
+                        />
+                      ) : (
+                        <p
+                          className={`text-lg cursor-pointer hover:text-blue-600 transition ${
+                            isMismatch ? 'text-red-500' : 'text-gray-700'
+                          }`}
+                          onClick={() => setEditingNote({ date: item.date, note: item.note })}
+                        >
+                          {item.note || 'Click to Edit'}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
