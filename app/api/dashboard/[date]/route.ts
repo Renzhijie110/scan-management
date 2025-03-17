@@ -3,10 +3,10 @@ import postgres from 'postgres';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
-export async function PUT(request: NextRequest, context: { params: { date: string } }) {
+export async function POST(request: NextRequest) {
   try {
-    const { note } = await request.json();
-    const { date } = context.params; 
+    const { note, date } = await request.json();
+
 
     if (!date || note === undefined) {
       return NextResponse.json({ error: "缺少必要参数" }, { status: 400 });

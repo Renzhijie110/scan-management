@@ -31,9 +31,9 @@ export default function Dashboard() {
   const updateNote = async (date: string, note: string) => {
     try {
       const response = await fetch(`/api/dashboard/${date}`, {
-        method: "PUT",
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ note }),
+        body: JSON.stringify({date, note }),
       });
   
       if (response.ok) {
