@@ -3,7 +3,7 @@ import postgres from 'postgres';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
-export async function PUT(request: NextRequest, context: { params: { date: string } }) {
+export async function PUT(request: NextRequest, context: { params: { date: any } }) {
   try {
     const { note } = await request.json();
     const { date } = await context.params; // ⚠️ 这里需要 await
