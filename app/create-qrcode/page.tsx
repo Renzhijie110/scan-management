@@ -56,56 +56,103 @@ export default function CreateQRCode() {
     }
   };
 
+  // const handlePrint = () => {
+  //   const iframe = document.createElement('iframe');
+  //   iframe.style.position = 'absolute';
+  //   iframe.style.width = '0px';
+  //   iframe.style.height = '0px';
+  //   iframe.style.border = 'none';
+  //   document.body.appendChild(iframe);
+  
+  //   const doc = iframe.contentWindow?.document;
+  //   if (doc) {
+  //     doc.open();
+  //     doc.write(`
+  //       <html>
+  //         <head>
+  //           <title>Print QR Code</title>
+  //           <style>
+  //             @media print {
+  //               .qr-container:not(:first-child) {
+  //                 page-break-before: always;
+  //               }
+  //             }
+  //             body { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+  //             img { max-width: 100%; }
+  //             p { margin-top: 10px; font-size: 60px; color: #333; }
+  //               .highlight1 { font-size: 320px; font-weight: bold; font-family: "Courier New", monospace; }
+  //               .highlight2 { font-size: 150px; font-weight: bold; font-family: "Courier New", monospace; }
+  //           </style>
+  //         </head>
+  //         <body>
+  //           ${qrCodes.map(qr => `
+  //             <div class="qr-container">
+  //               <p>G-ID: ${qr.itemId.slice(0, 6)}<br/>
+  //                 <span class="highlight1">${qr.itemId.slice(6,10)}</span><br/>
+  //                 <span class="highlight2">${qr.itemId.slice(10)}</span>
+  //                 <img src="${qr.qrImage}" alt="QR Code" />
+  //               </p>
+  //             </div>
+  //           `).join('')}
+  //         </body>
+  //       </html>
+  //     `);
+  //     doc.close();
+  
+  //     iframe.contentWindow?.focus();
+  //     iframe.contentWindow?.print();
+  //     document.body.removeChild(iframe);
+  //   }
+
+  // };
   const handlePrint = () => {
-    const iframe = document.createElement('iframe');
-    iframe.style.position = 'absolute';
-    iframe.style.width = '0px';
-    iframe.style.height = '0px';
-    iframe.style.border = 'none';
-    document.body.appendChild(iframe);
+    const printWindow = window.open("", "_blank");
   
-    const doc = iframe.contentWindow?.document;
-    if (doc) {
-      doc.open();
-      doc.write(`
-        <html>
-          <head>
-            <title>Print QR Code</title>
-            <style>
-              @media print {
-                .qr-container:not(:first-child) {
-                  page-break-before: always;
-                }
-              }
-              body { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-              img { max-width: 100%; }
-              p { margin-top: 10px; font-size: 60px; color: #333; }
-                .highlight1 { font-size: 320px; font-weight: bold; font-family: "Courier New", monospace; }
-                .highlight2 { font-size: 150px; font-weight: bold; font-family: "Courier New", monospace; }
-            </style>
-          </head>
-          <body>
-            ${qrCodes.map(qr => `
-              <div class="qr-container">
-                <p>G-ID: ${qr.itemId.slice(0, 6)}<br/>
-                  <span class="highlight1">${qr.itemId.slice(6,10)}</span><br/>
-                  <span class="highlight2">${qr.itemId.slice(10)}</span>
-                  <img src="${qr.qrImage}" alt="QR Code" />
-                </p>
-              </div>
-            `).join('')}
-          </body>
-        </html>
-      `);
-      doc.close();
-  
-      iframe.contentWindow?.focus();
-      iframe.contentWindow?.print();
-      document.body.removeChild(iframe);
+    // 检查 printWindow 是否成功打开
+    if (!printWindow) {
+      alert("无法打开打印窗口，请允许浏览器弹出窗口后重试。");
+      return;
     }
-
+  
+    const printContent = qrCodes.map(qr => `
+      <div class="qr-container">
+        <p>G-ID: ${qr.itemId.slice(0, 6)}<br/>
+          <span class="highlight1">${qr.itemId.slice(6,10)}</span><br/>
+          <span class="highlight2">${qr.itemId.slice(10)}</span>
+          <img src="${qr.qrImage}" alt="QR Code" />
+        </p>
+      </div>
+    `).join('');
+  
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Print QR Code</title>
+          <style>
+            @media print {
+              .qr-container:not(:first-child) { page-break-before: always; }
+            }
+            body { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+            img { max-width: 100%; }
+            p { margin-top: 10px; font-size: 60px; color: #333; }
+            .highlight1 { font-size: 320px; font-weight: bold; font-family: "Courier New", monospace; }
+            .highlight2 { font-size: 150px; font-weight: bold; font-family: "Courier New", monospace; }
+          </style>
+        </head>
+        <body>${printContent}</body>
+      </html>
+    `);
+  
+    printWindow.document.close();
+  
+    // 等待 500ms，确保页面加载后再打印
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 500);
   };
-
+  
+  
   return (
     <main className="min-h-screen p-8">
       <div className="max-w-md mx-auto">
