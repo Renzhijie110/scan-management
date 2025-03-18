@@ -18,7 +18,7 @@ export default function Navbar() {
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-                物品追踪系统
+              Pallet Tracking System
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
               <Link
@@ -29,7 +29,7 @@ export default function Navbar() {
                     : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                 }`}
               >
-                仪表盘
+                Dashboard
               </Link>
               <Link
                 href="/boxes"
@@ -39,7 +39,7 @@ export default function Navbar() {
                     : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                 }`}
               >
-                物品列表
+                Item List
               </Link>
               <Link
                 href="/create-qrcode"
@@ -49,7 +49,7 @@ export default function Navbar() {
                     : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                 }`}
               >
-                生成二维码
+                Generate QR Code
               </Link>
             </div>
           </div>
