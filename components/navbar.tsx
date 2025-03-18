@@ -1,10 +1,16 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    localStorage.removeItem('warehouse');
+    router.push('/');
+  };
 
   return (
     <nav className="bg-white shadow-sm">
@@ -15,7 +21,7 @@ export default function Navbar() {
                 物品追踪系统
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-            <Link
+              <Link
                 href="/dashboard"
                 className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                   pathname === '/dashboard'
@@ -47,8 +53,16 @@ export default function Navbar() {
               </Link>
             </div>
           </div>
+          <div className="flex items-center">
+            <button 
+              onClick={handleLogout} 
+              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </div>
     </nav>
-  );
-} 
+  ); 
+}

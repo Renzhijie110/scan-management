@@ -8,7 +8,7 @@ export default function CreateQRCode() {
   const router = useRouter();
   useEffect(() => {
     const warehouse = localStorage.getItem('warehouse');
-    if (warehouse !== 'JFK' && warehouse !== 'EWR') {
+    if (warehouse === null) {
       router.push('/'); // 强制跳转回登录页
     }
   }, []);
