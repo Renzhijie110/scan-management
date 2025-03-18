@@ -8,6 +8,8 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editingNote, setEditingNote] = useState<{ date: string; note: string } | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const fetchDashboard = async () => {
     try {
@@ -31,25 +33,25 @@ export default function Dashboard() {
   const updateNote = async (date: string, note: string) => {
     try {
       const response = await fetch(`/api/dashboard/${date}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({date, note }),
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ date, note }),
       });
-  
+
       if (response.ok) {
-        setDashboard(prev => 
+        setDashboard(prev =>
           prev.map(item => (item.date === date ? { ...item, note } : item))
         );
-        setFilteredDashboard(prev => 
+        setFilteredDashboard(prev =>
           prev.map(item => (item.date === date ? { ...item, note } : item))
         );
         setEditingNote(null);
       } else {
-        setError("更新失败");
+        setError('更新失败');
       }
     } catch (error) {
-      console.error("Error updating note:", error);
-      setError("网络错误，请稍后重试");
+      console.error('Error updating note:', error);
+      setError('网络错误，请稍后重试');
     }
   };
 
@@ -65,17 +67,28 @@ export default function Dashboard() {
     return (
       <div className="text-center p-6 text-red-500">
         <p>{error}</p>
-        <button onClick={fetchDashboard} className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+        <button
+          onClick={fetchDashboard}
+          className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+        >
           重试
         </button>
       </div>
     );
   }
+
+  // 计算当前页的数据
+  const totalPages = Math.ceil(filteredDashboard.length / itemsPerPage);
+  const currentItems = filteredDashboard.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   return (
     <div className="bg-white p-8 shadow-lg rounded-lg max-w-6xl mx-auto w-full">
       <h2 className="text-3xl font-semibold mb-6 text-gray-800">Dashboard</h2>
       <div className="divide-y divide-gray-300">
-        {filteredDashboard.map((item) => {
+        {currentItems.map(item => {
           const isMismatch = item.note && Number(item.sorting_count) !== Number(item.note);
 
           return (
@@ -108,7 +121,7 @@ export default function Dashboard() {
                         <input
                           type="text"
                           value={editingNote?.note ?? ''}
-                          onChange={(e) => {
+                          onChange={e => {
                             if (editingNote) {
                               setEditingNote({ ...editingNote, note: e.target.value });
                             }
@@ -141,9 +154,25 @@ export default function Dashboard() {
           );
         })}
       </div>
+
+      {/* 分页控件 */}
+      <div className="flex justify-center mt-6">
+        <button
+          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+          className="px-4 py-2 mx-1 bg-gray-300 rounded-lg disabled:opacity-50 hover:bg-gray-400 transition"
+        >
+          Prev
+        </button>
+        <span className="px-4 py-2 text-lg">{currentPage} / {totalPages}</span>
+        <button
+          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+          disabled={currentPage === totalPages}
+          className="px-4 py-2 mx-1 bg-gray-300 rounded-lg disabled:opacity-50 hover:bg-gray-400 transition"
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
-  
-  
-
 }
