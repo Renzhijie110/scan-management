@@ -58,6 +58,7 @@ export default function CreateQRCode() {
 
   const handlePrint = () => {
     const iframe = document.createElement('iframe');
+    iframe.style.font = ''
     iframe.style.position = 'absolute';
     iframe.style.width = '0px';
     iframe.style.height = '0px';
@@ -78,8 +79,8 @@ export default function CreateQRCode() {
               body { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
               img { max-width: 100%; }
               p { margin-top: 10px; font-size: 60px; color: #333; }
-              .highlight1 { font-size: 320px; font-weight: bold; }
-              .highlight2 { font-size: 150px; font-weight: bold; }
+                .highlight1 { font-size: 320px; font-weight: bold; font-family: "Courier New", monospace; }
+                .highlight2 { font-size: 150px; font-weight: bold; font-family: "Courier New", monospace; }
             </style>
           </head>
           <body>
