@@ -82,7 +82,7 @@ export default function CreateQRCode() {
         <p>G-ID: ${qr.itemId.slice(0, 6)}<br/>
           <span class="highlight1">${qr.itemId.slice(6,10)}</span><br/>
           <span class="highlight2">${qr.itemId.slice(10)}</span>
-          <img src="${qr.qrImage}" alt="QR Code" />
+          <img src="${qr.qrImage}" alt="QR Code" style="float: right; width: 180px; height: auto;" />
         </p>
       </div>
     `).join('');
@@ -99,7 +99,7 @@ export default function CreateQRCode() {
             img { max-width: 100%; }
             p { margin-top: 10px; font-size: 60px; color: #333; }
             .highlight1 { font-size: 320px;  font-family: "Courier New", monospace; }
-            .highlight2 { font-size: 150px; font-weight: bold; font-family: "Courier New", monospace; }
+            .highlight2 { font-size: 150px;  font-family: "Courier New", monospace; }
           </style>
         </head>
         <body>${printContent}</body>
