@@ -48,13 +48,13 @@ export default function CreateQRCode() {
           return;
         }
 
-        const data = `https://scan-management.vercel.app/track?item_id=${itemId}`;
+        const data = `${itemId}`;
         const qrImage = await QRCode.toDataURL(data);
 
         await fetch("/api/boxes", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ box_id: itemId, qr_code: data, created_at: timestamp, user_id }),
+          body: JSON.stringify({ box_id: itemId, created_at: timestamp, user_id }),
         });
 
         newQrCodes.push({ itemId, qrImage, createdAt: timestamp });
