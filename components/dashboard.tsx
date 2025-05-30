@@ -17,11 +17,11 @@ export default function Dashboard() {
   useEffect(() => {
     fetchDashboard();
   }, []);
-  const handleUnscannedClick = async (date: string, start_warehouse: string) => {
+  const handleUnscannedClick = async (date: string, start_warehouse: string, destination_warehouse: string) => {
     setUnscannedLoading(true);
     setShowDetailModal(true);
     try {
-      const res = await fetch(`/api/unscannedDetail?date=${date}&start_warehouse=${start_warehouse}`);
+      const res = await fetch(`/api/unscannedDetail?date=${date}&start_warehouse=${start_warehouse}&destination_warehouse=${destination_warehouse}`);
       const data = await res.json();
       setUnscannedDetail(data.boxes);
     } catch (e) {
@@ -110,7 +110,7 @@ export default function Dashboard() {
                       <td style={styles.tdRight}>{row.total_pallet_count}</td>
                       <td style={styles.tdRight}>{row.scan_pallet_count}</td>
                       <td style={{ ...styles.tdRight, color: '#409eff', cursor: 'pointer' }}
-                          onClick={() => handleUnscannedClick(row.date,row.start_warehouse)}>
+                          onClick={() => handleUnscannedClick(row.date,row.start_warehouse,row.destination_warehouse)}>
                         {row.unscanned_count}
                       </td>
                       <td style={styles.td}>
