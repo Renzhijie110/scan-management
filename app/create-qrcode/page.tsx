@@ -2,15 +2,17 @@
 
 import { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
-import { useRouter } from 'next/navigation';
+
 
 export default function CreateQRCode() {
-  const router = useRouter();
 
-  const [qrCodes, setQrCodes] = useState<{ itemId: string; qrImage: string; createdAt: string; }[]>([]);
+  const [qrCode, setQrCode] = useState<{ pallet_id: string; qrImage: string } | null>(null);
+  const [warehouseList, setWarehouseList] = useState<{ id: string; name: string }[] | null>(null);
   const [dateInput, setDateInput] = useState("");
-  const [warehouseInput, setWarehouseInput] = useState("");
+  const [warehouseInput, setWarehouseInput] = useState('');
+  const [selectedOptionsw, setSelectedOptionsw] = useState<17>(17);
   const [error, setError] = useState('');
+  const [boxId, setBoxId] = useState(0);
   const [datePickerValue, setDatePickerValue] = useState(''); // YYYY-MM-DD格式
   useEffect(() => {
     const today = new Date();
@@ -20,46 +22,58 @@ export default function CreateQRCode() {
     const dd = today.getDate().toString().padStart(2, '0');
     const formattedPickerDate = `${yyyy}-${mm}-${dd}`;
     setDatePickerValue(formattedPickerDate);
-
-    // 设置默认YYMMDD格式给dateInput
-    const yy = yyyy.toString().slice(2);
-    setDateInput(`${yy}${mm}${dd}`);
+    setDateInput(`${yyyy}${mm}${dd}`);
   }, []);
-  
-  const generateQRCodes = async () => {
-    if (!dateInput || !warehouseInput ) {
+  const createPallet = async (dateInput:any,selectedOptionsw:any,warehouseInput:any,boxId:any): Promise<Response> => {
+    return await fetch("/api/createPallet", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pallet_group_id: `${dateInput}_${selectedOptionsw}_${warehouseInput}`, boxId: boxId, date: dateInput,sw:selectedOptionsw,dw:warehouseInput}),
+    });
+  };
+  const getPalletMax = async (pallet_group_id: any): Promise<Response> => {
+    return await fetch(`/api/getPalletMax?pallet_group_id=${pallet_group_id}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+  };
+  const getWarehouseList = async (warehouseInput: string): Promise<Response> => {
+    return await fetch(`/api/getWarehouseList?warehouseInput=${warehouseInput}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+  };
+  const generateQRCode = async () => {
+    if (!selectedOptionsw || !dateInput || !warehouseInput) {
       setError("Please enter all fields: Date, Warehouse (^_^)");
       return;
     }
-
-
-    const newQrCodes = [];
-    try {
-      const timestamp = new Date().toLocaleString();
-      const user_id = localStorage.getItem("user_id");
-
-
-        const itemId = `${dateInput} ${warehouseInput}`;
-        const regex = /^\d{6} \d+$/;
-        if (!regex.test(itemId)) {
-          setError(`GID Wrong Format: ${itemId}, Required Format: YYMMDD XXX X (^_^)`);
-          return;
-        }
-
-        const data = `${itemId}`;
-        const qrImage = await QRCode.toDataURL(data);
-
-        await fetch("/api/boxes", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ box_id: itemId, created_at: timestamp, user_id }),
-        });
-
-        newQrCodes.push({ itemId, qrImage, createdAt: timestamp });
+    const res = await getWarehouseList(warehouseInput);
+    const data = await res.json();
+    const list = data.list;
     
+    if (list.length === 0) {
+      setError("Invalid Warehouse Number");
+      return;
+    }
+    
+    setWarehouseList(list);  // 设置状态
 
-
-      setQrCodes(newQrCodes);
+    try {
+      const pallet_group_id = `${dateInput}_${selectedOptionsw}_${warehouseInput}`;
+      if (!warehouseInput || isNaN(Number(warehouseInput))) {
+        setError(`GID Wrong Format: ${pallet_group_id} (^_^)`);
+        return;
+      }
+  
+      const response = await getPalletMax(pallet_group_id);
+      const data = await response.json();
+      const boxId = data.length + 1
+      setBoxId(data.length + 1)
+      const pallet_id = `${pallet_group_id}_${boxId}`;
+      const qrImage = await QRCode.toDataURL(pallet_id);
+  
+      setQrCode({ pallet_id, qrImage });
       setError("");
     } catch (err) {
       setError("Failed");
@@ -67,74 +81,167 @@ export default function CreateQRCode() {
     }
   };
   
-  const handlePrint = () => {
-    const printWindow = window.open("", "_blank");
   
-    // 检查 printWindow 是否成功打开
-    if (!printWindow) {
-      alert("无法打开打印窗口，请允许浏览器弹出窗口后重试。");
-      return;
-    }
+  const handlePrint = async () =>  {
+    if (!qrCode) return;
   
-    const printContent = qrCodes.map(qr => `
+    try {
+      const iframe = document.createElement("iframe");
+      iframe.style.position = "fixed";
+      iframe.style.right = "0";
+      iframe.style.bottom = "0";
+      iframe.style.width = "0";
+      iframe.style.height = "0";
+      iframe.style.border = "0";
+      document.body.appendChild(iframe);
+  
+      const printContent = `
       <div class="qr-container">
-        <p>G-ID: ${qr.itemId.slice(0, 6)}<br/>
-          <span class="highlight1">${qr.itemId.slice(6,10)}</span><br/>
-          <span class="highlight2">${qr.itemId.slice(10)}</span>
-          <img src="${qr.qrImage}" alt="QR Code" style="float: right; width: 180px; height: auto;" />
-        </p>
+        <div class="watermark">JFK</div>
+        <div class="content-row">
+          <div class="left-column">${warehouseList?.[0]?.name}</div>
+          
+          <div class="right-column">
+            <p>G-ID: ${dateInput.slice(0, 8)}-${warehouseInput}-${boxId}</p>
+            <div class="warehouse-ids">
+              ${warehouseList?.map(w => `<span class="warehouse-id">${w.id}</span>`).join(' ') ?? ''}
+            </div>
+            <img src="${qrCode.qrImage}" alt="QR Code" class="qr-img" />
+          </div>
+        </div>
       </div>
-    `).join('');
-  
-    printWindow.document.write(`
+    `;
+      
+    const doc = iframe.contentWindow?.document;
+    doc?.open();
+    doc?.write(`
       <html>
         <head>
           <title>Print QR Code</title>
           <style>
-            @media print {
-              .qr-container:not(:first-child) { page-break-before: always; }
+            body {
+              margin: 0;
+              font-family: Arial, sans-serif;
             }
-            body { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-            img { max-width: 100%; }
-            p { margin-top: 10px; font-size: 60px; color: #333; }
-            .highlight1 { font-size: 320px;  font-family: "Courier New", monospace; }
-            .highlight2 { font-size: 150px;  font-family: "Courier New", monospace; }
+            .qr-container {
+              position: relative;
+              width: 100%;
+              height: 100vh;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+            .content-row {
+              display: flex;
+              width: 90%;
+              justify-content: space-between;
+              align-items: center;
+            }
+            .left-column {
+              writing-mode: vertical-rl;
+              text-orientation: upright;
+              font-size: 200px;
+              font-weight: bold;
+              color: #222;
+            }
+            .right-column {
+              text-align: right;
+            }
+            .right-column p {
+              font-size: 90px;
+              margin: 0 0 100px 0;
+            }
+            .right-column div{
+              font-size: 50px;
+              margin: 0 250px 0 0;
+            }
+            .warehouse-ids {
+              font-size: 24px;
+              margin-bottom: 20px;
+            }
+            .warehouse-id {
+              margin-right: 10px;
+              display: inline-block;
+            }
+            .qr-img {
+              width: 180px;
+              height: auto;
+            }
+            .watermark {
+              position: fixed; /* 改为 fixed，覆盖整页 */
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%) rotate(-30deg);
+              font-size: 600px;
+              font-weight: 900;
+              color: rgba(0, 0, 0, 0.04); /* 更淡，更像背景 */
+              z-index: 0;
+              pointer-events: none;
+              user-select: none;
+              white-space: nowrap;
+            }
           </style>
         </head>
-        <body>${printContent}</body>
+        <body>
+          ${printContent}
+        </body>
       </html>
     `);
-  
-    printWindow.document.close();
-  
-    // 等待 500ms，确保页面加载后再打印
-    setTimeout(() => {
-      printWindow.print();
-      printWindow.close();
-    }, 500);
+    doc?.close();
+    
+
+      iframe.onload = () => {
+        setTimeout(() => {
+          iframe.contentWindow?.focus();
+          iframe.contentWindow?.print();
+        }, 500);
+      };
+    } catch (err) {
+      setError("Failed");
+      console.error("Error:", err);
+    } finally{
+      await createPallet(dateInput,selectedOptionsw,warehouseInput,boxId)
+      setWarehouseList([]);
+      setWarehouseInput("");
+      setQrCode(null);
+      setError("");
+    }
   };
-
-
-    // 处理日期选择器变化，自动转成YYMMDD
-    const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  
+  // 处理日期选择器变化，自动转成YYMMDD
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const val = e.target.value; // 格式 YYYY-MM-DD
       setDatePickerValue(val);
-  
       if (!val) {
         setDateInput('');
         return;
       }
-  
       const [yyyy, mm, dd] = val.split('-');
-      const yy = yyyy.slice(2);
-      setDateInput(`${yy}${mm}${dd}`);
-    };
-  
-    return (
+      setDateInput(`${yyyy}${mm}${dd}`);
+  };
+  return (
       <main className="min-h-screen p-12 bg-gray-50 flex items-center justify-center">
         <div className="max-w-lg w-full bg-white p-8 rounded-xl shadow-xl">
           <h1 className="text-4xl font-extrabold mb-10 text-center text-blue-700">Generate QR Codes</h1>
           <div className="space-y-6">
+          <label htmlFor="date-picker" className="block mb-3 font-semibold text-lg text-gray-800">
+            Start Warehouse
+          </label>
+          <div style={{ fontSize: '18px', display: 'flex', gap: '20px' }}>
+              {([17] as const).map((option) => (
+                <label key={option}>
+                  <input
+                    type="radio"
+                    name="swSelect"
+                    value={option}
+                    checked={selectedOptionsw === option}
+                    onChange={() => setSelectedOptionsw(option)}
+                    style={{ marginRight: '8px' }}
+                  />
+                  {option}
+                </label>
+              ))}
+            </div>
             <div>
               <label htmlFor="date-picker" className="block mb-3 font-semibold text-lg text-gray-800">
                 Select Date
@@ -153,7 +260,7 @@ export default function CreateQRCode() {
     
             <div>
               <label htmlFor="warehouse" className="block mb-3 font-semibold text-lg text-gray-800">
-                Warehouse Number
+                Destination Warehouse Number
               </label>
               <input
                 id="warehouse"
@@ -166,7 +273,7 @@ export default function CreateQRCode() {
             </div>
     
             <button
-              onClick={generateQRCodes}
+              onClick={generateQRCode}
               className="w-full bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold text-2xl py-4 rounded-lg shadow-md hover:from-blue-700 hover:to-blue-500 transition"
             >
               Generate QR Codes
@@ -177,30 +284,21 @@ export default function CreateQRCode() {
             <p className="text-red-600 mt-6 text-center font-semibold text-lg">{error}</p>
           )}
     
-          {qrCodes.length > 0 && (
+          {qrCode && (
             <div className="mt-12 text-center">
-              <h2 className="text-3xl font-semibold mb-6 text-gray-800">Finished</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                {qrCodes.map((qr) => (
-                  <div
-                    key={qr.itemId}
-                    className="border border-gray-300 p-4 rounded-xl shadow-sm hover:shadow-lg transition"
-                  >
-                    <p className="text-gray-700 text-xl font-mono mb-4">{qr.itemId}</p>
-                    <img src={qr.qrImage} alt="QR Code" className="mx-auto w-48 h-auto" />
-                  </div>
-                ))}
+              <div className="border border-gray-300 p-4 rounded-xl shadow-sm hover:shadow-lg transition inline-block">
+                <p className="text-gray-700 text-xl font-mono mb-4">{qrCode.pallet_id}</p>
+                <img src={qrCode.qrImage} alt="QR Code" className="mx-auto w-48 h-auto" />
               </div>
               <button
                 onClick={handlePrint}
                 className="mt-10 bg-gradient-to-r from-green-600 to-green-400 text-white font-bold text-2xl py-4 rounded-lg shadow-md hover:from-green-700 hover:to-green-500 transition"
               >
-                Print QR Codes
+                Print Pallet Label
               </button>
             </div>
           )}
         </div>
       </main>
-    );
-    
+  );
 }

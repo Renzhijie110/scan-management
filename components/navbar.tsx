@@ -30,8 +30,8 @@ export default function Navbar() {
           {/* 桌面导航 */}
           <div className="hidden sm:flex sm:space-x-8">
             <NavLink href="/create-qrcode" currentPath={pathname} label="Generate QR Code" />
+            <NavLink href="/scan" currentPath={pathname} label="Scan" />  
             <NavLink href="/dashboard" currentPath={pathname} label="Dashboard" />
-            <NavLink href="/boxes" currentPath={pathname} label="Item List" />
           </div>
 
           {/* 右侧按钮 */}
@@ -71,9 +71,7 @@ export default function Navbar() {
       {/* 手机菜单展开 */}
       {mobileMenuOpen && (
         <div className="sm:hidden bg-white border-t border-gray-200 px-4 py-4 space-y-3">
-          <NavLink href="/create-qrcode" currentPath={pathname} label="Generate QR Code" mobile />
-          <NavLink href="/dashboard" currentPath={pathname} label="Dashboard" mobile />
-          <NavLink href="/boxes" currentPath={pathname} label="Item List" mobile />
+          <NavLink href="/scan" currentPath={pathname} label="Scan" />  
           <button
             onClick={handleLogout}
             className="w-full bg-gray-500 text-white py-2 rounded-md hover:bg-orange-600 transition-colors duration-200"

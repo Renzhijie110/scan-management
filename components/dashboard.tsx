@@ -7,172 +7,311 @@ export default function Dashboard() {
   const [filteredDashboard, setFilteredDashboard] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [editingNote, setEditingNote] = useState<{ date: string; note: string } | null>(null);
+  const [editingNote, setEditingNote] = useState<{ id: number; comment: string } | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [unscannedDetail, setUnscannedDetail] = useState<any[] | null>(null);
+  const [unscannedLoading, setUnscannedLoading] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
   const itemsPerPage = 10;
 
+  useEffect(() => {
+    fetchDashboard();
+  }, []);
+  const handleUnscannedClick = async (date: string, start_warehouse: string) => {
+    setUnscannedLoading(true);
+    setShowDetailModal(true);
+    try {
+      const res = await fetch(`/api/unscannedDetail?date=${date}&start_warehouse=${start_warehouse}`);
+      const data = await res.json();
+      setUnscannedDetail(data.boxes);
+    } catch (e) {
+      alert('加载未扫详情失败');
+      setUnscannedDetail(null);
+    } finally {
+      setUnscannedLoading(false);
+    }
+  };
   const fetchDashboard = async () => {
     try {
       setLoading(true);
-      setError(null);
       const response = await fetch('/api/dashboard');
-      if (response.ok) {
-        const data = await response.json();
-        setDashboard(data);
-        setFilteredDashboard(data);
-      } else {
-        setError('获取数据失败');
-      }
-    } catch (error) {
-      setError('网络错误，请稍后重试');
+      const data = await response.json();
+      setDashboard(data);
+      setFilteredDashboard(data);
+    } catch (e) {
+      setError('加载失败，请稍后再试。');
     } finally {
       setLoading(false);
     }
   };
 
-  const updateNote = async (date: string, note: string) => {
-    try {
-      const response = await fetch(`/api/dashboard/${date}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date, note }),
-      });
-
-      if (response.ok) {
-        setDashboard(prev =>
-          prev.map(item => (item.date === date ? { ...item, note } : item))
-        );
-        setFilteredDashboard(prev =>
-          prev.map(item => (item.date === date ? { ...item, note } : item))
-        );
-        setEditingNote(null);
-      } else {
-        setError('更新失败');
-      }
-    } catch (error) {
-      console.error('Error updating note:', error);
-      setError('网络错误，请稍后重试');
-    }
-  };
-
-  useEffect(() => {
-    fetchDashboard();
-  }, []);
-
-  if (loading) {
-    return <div className="text-center p-6 text-lg">加载中...</div>;
-  }
-
-  if (error) {
-    return (
-      <div className="text-center p-6 text-red-500">
-        <p>{error}</p>
-        <button
-          onClick={fetchDashboard}
-          className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-        >
-          重试
-        </button>
-      </div>
-    );
-  }
-
-  // 计算当前页的数据
-  const totalPages = Math.ceil(filteredDashboard.length / itemsPerPage);
-  const currentItems = filteredDashboard.slice(
+  const pagedData = filteredDashboard.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
+  const totalPages = Math.ceil(filteredDashboard.length / itemsPerPage);
+
+  const startEdit = (index: number) => {
+    setEditingNote({ id: index, comment: dashboard[index].comment || '' });
+  };
+
+  const saveEdit = async () => {
+    if (editingNote) {
+      try {
+        const { id, comment } = editingNote;
+        const item = dashboard[id];
+        const res = await fetch(`/api/editNote`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ item,comment }),
+        });
+        if (!res.ok) throw new Error('更新失败');
+  
+        // 本地更新
+        const newData = [...dashboard];
+        newData[id].comment = comment;
+        setDashboard(newData);
+        setFilteredDashboard(newData);
+        setEditingNote(null);
+      } catch (err) {
+        alert('保存失败，请稍后重试');
+      }
+    }
+  };
+  
+
   return (
-    <div className="bg-white p-8 shadow-lg rounded-lg max-w-6xl mx-auto w-full">
-      <h2 className="text-3xl font-semibold mb-6 text-gray-800">Dashboard</h2>
-      <div className="divide-y divide-gray-300">
-        {currentItems.map(item => {
-          const isMismatch = item.note && Number(item.sorting_count) !== Number(item.note);
+    <div style={styles.container}>
+      <h2 style={styles.title}>Pallet Dashboard</h2>
 
-          return (
-            <div key={`${item.date}-${item.orig_warehouse}`} className="py-6">
-              <div className="flex justify-between items-center mb-4">
-                <p className="text-xl font-semibold text-gray-800">{item.date}</p>
-                <div className="grid grid-cols-6 gap-6 text-right">
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Orig Warehouse</p>
-                    <p className="text-lg font-semibold text-gray-700">{item.orig_warehouse}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Dest Warehouse</p>
-                    <p className="text-lg font-semibold text-gray-700">{item.dest_warehouse}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Sorting Scanned</p>
-                    <p className={`text-lg font-semibold ${isMismatch ? 'text-red-500' : 'text-gray-700'}`}>
-                      {item.sorting_count}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Driver Scanned</p>
-                    <p className="text-lg font-semibold text-gray-700">{item.driver_count}</p>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div className="w-full">
-                      <p className="text-sm font-medium text-gray-500">Actual Pallet</p>
-                      {editingNote?.date === item.date ? (
-                        <input
-                          type="text"
-                          value={editingNote?.note ?? ''}
-                          onChange={e => {
-                            if (editingNote) {
-                              setEditingNote({ ...editingNote, note: e.target.value });
-                            }
-                          }}
-                          onBlur={() => {
-                            if (editingNote) {
-                              updateNote(item.date, editingNote.note);
-                            }
-                          }}
-                          className={`text-lg border rounded-md p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition ${
-                            isMismatch ? 'text-red-500' : 'text-gray-700'
-                          }`}
-                          autoFocus
-                        />
-                      ) : (
-                        <p
-                          className={`text-lg cursor-pointer hover:text-blue-600 transition ${
-                            isMismatch ? 'text-red-500' : 'text-gray-700'
-                          }`}
-                          onClick={() => setEditingNote({ date: item.date, note: item.note })}
-                        >
-                          {item.note || 'Click to Edit'}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      {loading && <p style={styles.tip}>加载中...</p>}
+      {error && <p style={{ ...styles.tip, color: 'crimson' }}>{error}</p>}
 
-      {/* 分页控件 */}
-      <div className="flex justify-center mt-6">
-        <button
-          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          className="px-4 py-2 mx-1 bg-gray-300 rounded-lg disabled:opacity-50 hover:bg-gray-400 transition"
-        >
-          Prev
-        </button>
-        <span className="px-4 py-2 text-lg">{currentPage} / {totalPages}</span>
-        <button
-          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-          disabled={currentPage === totalPages}
-          className="px-4 py-2 mx-1 bg-gray-300 rounded-lg disabled:opacity-50 hover:bg-gray-400 transition"
-        >
-          Next
-        </button>
-      </div>
+      {!loading && !error && (
+        <>
+          <div style={styles.card}>
+            <table style={styles.table}>
+              <thead style={styles.tableHead}>
+                <tr>
+                  {['日期', '起始仓', '目的仓', '总板数', '已扫', '未扫', '备注', '操作'].map((head) => (
+                    <th key={head} style={styles.th}>{head}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {pagedData.map((row, idx) => {
+                  const globalIndex = (currentPage - 1) * itemsPerPage + idx;
+                  return (
+                    <tr key={globalIndex} style={styles.tr}>
+                      <td style={styles.td}>{row.date}</td>
+                      <td style={styles.td}>{row.start_warehouse}</td>
+                      <td style={styles.td}>{row.destination_warehouse}</td>
+                      <td style={styles.tdRight}>{row.total_pallet_count}</td>
+                      <td style={styles.tdRight}>{row.scan_pallet_count}</td>
+                      <td style={{ ...styles.tdRight, color: '#409eff', cursor: 'pointer' }}
+                          onClick={() => handleUnscannedClick(row.date,row.start_warehouse)}>
+                        {row.unscanned_count}
+                      </td>
+                      <td style={styles.td}>
+                        {editingNote?.id === globalIndex ? (
+                          <input
+                            value={editingNote.comment}
+                            onChange={(e) =>
+                              setEditingNote({ ...editingNote, comment: e.target.value })
+                            }
+                            style={styles.input}
+                          />
+                        ) : (
+                          row.comment || ''
+                        )}
+                      </td>
+                      <td style={styles.td}>
+                        {editingNote?.id === globalIndex ? (
+                          <>
+                            <button style={styles.btnPrimary} onClick={saveEdit}>保存</button>
+                            <button style={styles.btnGray} onClick={() => setEditingNote(null)}>取消</button>
+                          </>
+                        ) : (
+                          <button style={styles.btnSoft} onClick={() => startEdit(globalIndex)}>编辑</button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          <div style={styles.pagination}>
+            <button
+              style={currentPage === 1 ? styles.pageDisabled : styles.pageBtn}
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+            >
+              上一页
+            </button>
+            <span style={styles.pageText}>第 {currentPage} / {totalPages} 页</span>
+            <button
+              style={currentPage === totalPages ? styles.pageDisabled : styles.pageBtn}
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+            >
+              下一页
+            </button>
+          </div>
+        </>
+      )}
+      {showDetailModal && (
+        <div style={styles.modalOverlay}>
+          <div style={styles.modalContent}>
+            <h3 style={styles.modalTitle}>未扫详情</h3>
+            {unscannedLoading ? (
+              <p>加载中...</p>
+            ) : unscannedDetail ? (
+              <ul style={styles.detailList}>
+                {unscannedDetail.map((item, idx) => (
+                  <li key={idx} style={{ marginBottom: '12px' }}>
+                    <strong>时间:</strong> {item.date}<br />
+                    <strong>起始仓:</strong> {item.start_warehouse} ➡
+                    <strong>目的仓:</strong> {item.destination_warehouse}<br />
+                    <strong>箱号:</strong> {item.box_id}<br />                    
+                    <strong>创建时间:</strong> {new Date(item.created_at).toLocaleString()}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>暂无数据</p>
+            )}
+            <button style={styles.btnPrimary} onClick={() => setShowDetailModal(false)}>关闭</button>
+          </div>
+        </div>
+      )}
     </div>
+    
   );
+  
 }
+
+const styles: Record<string, React.CSSProperties> = {
+  container: {
+    maxWidth: 1200,
+    margin: '40px auto',
+    padding: '0 20px',
+    fontFamily: `'Noto Sans SC', sans-serif`,
+    backgroundColor: '#f9fafb',
+  },
+  title: {
+    textAlign: 'center',
+    fontSize: 24,
+    color: '#333',
+    marginBottom: 24,
+  },
+  tip: {
+    textAlign: 'center',
+    fontSize: 16,
+    color: '#999',
+  },
+  card: {
+    borderRadius: 12,
+    backgroundColor: '#fff',
+    padding: 16,
+    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.05)',
+  },
+  table: {
+    width: '100%',
+    tableLayout: 'fixed', // 强制每列平分
+    borderCollapse: 'separate',
+    borderSpacing: 0,
+  },
+  tableHead: {
+    backgroundColor: '#f0f4f8',
+  },
+  th: {
+    textAlign: 'left',
+    padding: '10px 16px', // 与 td 一致
+    fontWeight: 500,
+    fontSize: 14,
+    color: '#555',
+    borderBottom: '1px solid #e0e6ed',
+    whiteSpace: 'nowrap',
+  },
+  td: {
+    padding: '10px 16px',
+    fontSize: 14,
+    color: '#333',
+    whiteSpace: 'nowrap',
+    textAlign: 'left',
+  },
+  tr: {
+    borderBottom: '1px solid #f0f0f0',
+  },
+
+  tdRight: {
+    padding: '10px 16px',
+    fontSize: 14,
+    color: '#333',
+    textAlign: 'left',
+    whiteSpace: 'nowrap',
+  },
+  input: {
+    width: '100%',
+    padding: '6px 8px',
+    fontSize: 14,
+    borderRadius: 6,
+    border: '1px solid #d0d5dd',
+    backgroundColor: '#fff',
+  },
+  btnPrimary: {
+    backgroundColor: '#409eff',
+    color: '#fff',
+    border: 'none',
+    padding: '6px 12px',
+    borderRadius: 6,
+    marginRight: 8,
+    cursor: 'pointer',
+  },
+  btnGray: {
+    backgroundColor: '#f0f0f0',
+    color: '#666',
+    border: 'none',
+    padding: '6px 12px',
+    borderRadius: 6,
+    cursor: 'pointer',
+  },
+  btnSoft: {
+    backgroundColor: '#eef3f8',
+    color: '#336699',
+    border: 'none',
+    padding: '6px 12px',
+    borderRadius: 6,
+    cursor: 'pointer',
+  },
+  pagination: {
+    marginTop: 24,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 16,
+  },
+  pageBtn: {
+    padding: '8px 16px',
+    backgroundColor: '#409eff',
+    color: '#fff',
+    border: 'none',
+    borderRadius: 6,
+    cursor: 'pointer',
+  },
+  pageDisabled: {
+    padding: '8px 16px',
+    backgroundColor: '#e0e0e0',
+    color: '#aaa',
+    border: 'none',
+    borderRadius: 6,
+    cursor: 'not-allowed',
+  },
+  pageText: {
+    color: '#666',
+    fontSize: 14,
+  },
+};
