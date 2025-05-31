@@ -74,7 +74,7 @@ export default function Dashboard() {
     try {
       const res = await getWarehouseList(item.destination_warehouse);
       const data = await res.json();
-      const list: { id: string; name: string }[] = data.list;
+      const list: { id: string, name: string }[] = data.list;
   
       if (!list || list.length === 0) return;
   
@@ -100,62 +100,50 @@ export default function Dashboard() {
         <style>
           @page {
             size: A4 landscape;
-            margin: 0mm;
-          }
-          html, body {
             margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: white;
-            width: 100%;
-            height: 100%;
           }
-          @media print {
-            body {
-              -webkit-print-color-adjust: exact;
-              print-color-adjust: exact;
-            }
+          body {
+            margin: 0;
+            font-family: Arial, sans-serif;
           }
           .qr-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            padding: 20px;
-            box-sizing: border-box;
           }
           .content-row {
             display: flex;
-            width: 100%;
+            width: 90%;
             justify-content: space-between;
             align-items: center;
           }
           .left-column {
             writing-mode: vertical-rl;
             text-orientation: upright;
-            font-size: 8vw;
+            font-size: 200px;
             font-weight: bold;
             color: #222;
-            flex-shrink: 0;
           }
           .right-column {
             text-align: right;
-            max-width: 70%;
           }
           .right-column p {
-            font-size: 4vw;
-            margin: 0 0 3vw 0;
+            font-size: 90px;
+            margin: 0 0 100px 0;
           }
           .right-column div {
-            font-size: 2.5vw;
-            margin: 0 3vw 2vw 0;
+            font-size: 50px;
+            margin: 0 250px 0 0;
           }
           .warehouse-ids {
-            font-size: 2vw;
-            margin-bottom: 2vw;
+            font-size: 24px;
+            margin-bottom: 20px;
           }
           .warehouse-id {
-            margin-right: 1vw;
+            margin-right: 10px;
             display: inline-block;
           }
           .qr-img {
@@ -167,7 +155,7 @@ export default function Dashboard() {
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(-30deg);
-            font-size: 35vw;
+            font-size: 600px;
             font-weight: 900;
             color: rgba(0, 0, 0, 0.04);
             z-index: 0;
@@ -178,23 +166,23 @@ export default function Dashboard() {
         </style>
       `;
   
-      const printWindow = window.open('', '_blank', 'width=1024,height=1366');
+      const printWindow = window.open('', '_blank', 'width=800,height=600');
       if (!printWindow) throw new Error('无法打开打印窗口');
   
       printWindow.document.open();
       printWindow.document.write(`
         <html>
           <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
             <title>打印二维码</title>
             ${style}
           </head>
-          <body onload="setTimeout(() => window.print(), 100); setTimeout(() => window.close(), 1000);">
+          <body onload="window.print(); window.close();">
             ${printContent}
           </body>
         </html>
       `);
       printWindow.document.close();
+  
     } catch (err) {
       setError("打印失败");
       console.error("打印出错:", err);
