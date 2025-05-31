@@ -100,15 +100,15 @@ export default function Dashboard() {
         <style>
           @page {
             size: A4 landscape;
-            margin: 0mm;
+            margin: 0;
           }
           html, body {
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: white;
             width: 100%;
             height: 100%;
+            background: white;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
           }
           @media print {
             body {
@@ -117,12 +117,14 @@ export default function Dashboard() {
             }
           }
           .qr-container {
+            width: 100vw;
+            height: 100vh;
+            padding: 2vw;
+            box-sizing: border-box;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            padding: 20px;
-            box-sizing: border-box;
+            position: relative;
           }
           .content-row {
             display: flex;
@@ -139,18 +141,15 @@ export default function Dashboard() {
             flex-shrink: 0;
           }
           .right-column {
-            text-align: right;
             max-width: 70%;
+            text-align: right;
           }
           .right-column p {
-            font-size: 4vw;
-            margin: 0 0 3vw 0;
+            font-size: 3.5vw;
+            margin: 0 0 2vw 0;
+            word-break: break-word;
           }
-          .right-column div {
-            font-size: 2.5vw;
-            margin: 0 3vw 2vw 0;
-          }
-          .warehouse-ids {
+          .right-column .warehouse-ids {
             font-size: 2vw;
             margin-bottom: 2vw;
           }
@@ -159,15 +158,15 @@ export default function Dashboard() {
             display: inline-block;
           }
           .qr-img {
-            width: 180px;
+            width: 160px;
             height: auto;
           }
           .watermark {
-            position: fixed;
+            position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(-30deg);
-            font-size: 35vw;
+            font-size: 30vw;
             font-weight: 900;
             color: rgba(0, 0, 0, 0.04);
             z-index: 0;
@@ -202,6 +201,7 @@ export default function Dashboard() {
       setError("");
     }
   };
+  
   
   
   
