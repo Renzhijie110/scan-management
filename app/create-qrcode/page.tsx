@@ -106,25 +106,25 @@ export default function CreateQRCode() {
         <style>
           @page {
             size: A4 landscape;
-            margin: 0;
+            margin: 10mm;
           }
           html, body {
             margin: 0;
             padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: white;
             width: 100%;
             height: 100%;
-            background: white;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
           }
           .qr-container {
-            width: 100vw;
+            position: relative;
+            width: 100%;
             height: 100vh;
-            padding: 2vw;
-            box-sizing: border-box;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
+            padding: 20px;
+            box-sizing: border-box;
           }
           .content-row {
             display: flex;
@@ -135,27 +135,31 @@ export default function CreateQRCode() {
           .left-column {
             writing-mode: vertical-rl;
             text-orientation: upright;
-            font-size: 7vw;
+            font-size: 160px; /* 更适配A4页面 */
             font-weight: bold;
             color: #222;
             flex-shrink: 0;
           }
           .right-column {
-            max-width: 70%;
             text-align: right;
+            max-width: 70%;
             box-sizing: border-box;
           }
           .right-column p {
-            font-size: 3.2vw;
-            margin: 0 0 2vw 0;
+            font-size: 60px;
+            margin: 0 0 60px 0;
             word-break: break-word;
           }
+          .right-column div {
+            font-size: 36px;
+            margin: 0 50px 20px 0;
+          }
           .warehouse-ids {
-            font-size: 2vw;
-            margin-bottom: 1.5vw;
+            font-size: 24px;
+            margin-bottom: 20px;
           }
           .warehouse-id {
-            margin-right: 1vw;
+            margin-right: 10px;
             display: inline-block;
           }
           .qr-img {
@@ -163,11 +167,11 @@ export default function CreateQRCode() {
             height: auto;
           }
           .watermark {
-            position: absolute;
+            position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(-30deg);
-            font-size: 30vw;
+            font-size: 400px;
             font-weight: 900;
             color: rgba(0, 0, 0, 0.04);
             z-index: 0;
@@ -178,7 +182,7 @@ export default function CreateQRCode() {
         </style>
       `;
   
-      const printWindow = window.open('', '_blank', 'width=1024,height=768');
+      const printWindow = window.open('', '_blank', 'width=1024,height=1366'); // iPad 分辨率比例
       if (!printWindow) throw new Error('Unable to open print window');
   
       printWindow.document.open();
@@ -189,15 +193,16 @@ export default function CreateQRCode() {
             <title>Print QR Code</title>
             ${style}
           </head>
-          <body onload="setTimeout(() => { window.print(); window.close(); }, 100);">
+          <body onload="window.print(); window.close();">
             ${printContent}
           </body>
         </html>
       `);
       printWindow.document.close();
+  
     } catch (err) {
-      setError("打印失败");
-      console.error("打印出错:", err);
+      setError("Failed");
+      console.error("Error:", err);
     } finally {
       await createPallet(dateInput, selectedOptionsw, warehouseInput, boxId);
       setWarehouseList([]);
@@ -206,7 +211,6 @@ export default function CreateQRCode() {
       setError("");
     }
   };
-  
   
   
   
