@@ -98,10 +98,20 @@ export default function Dashboard() {
   
       const style = `
         <style>
-          body {
-            margin: 0;
-            font-family: Arial, sans-serif;
+          @page {
+            size: A4 landscape;
+            margin: 10mm;
           }
+  
+          html, body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            width: 100%;
+            height: 100%;
+            background: white;
+          }
+  
           .qr-container {
             position: relative;
             width: 100%;
@@ -109,49 +119,64 @@ export default function Dashboard() {
             display: flex;
             align-items: center;
             justify-content: center;
+            box-sizing: border-box;
+            padding: 20px;
           }
+  
           .content-row {
             display: flex;
-            width: 90%;
+            width: 100%;
             justify-content: space-between;
             align-items: center;
           }
+  
           .left-column {
             writing-mode: vertical-rl;
             text-orientation: upright;
-            font-size: 200px;
+            font-size: 160px; /* 小一点适配iPad */
             font-weight: bold;
             color: #222;
+            flex-shrink: 0;
           }
+  
           .right-column {
             text-align: right;
+            max-width: 70%;
+            box-sizing: border-box;
           }
+  
           .right-column p {
-            font-size: 90px;
-            margin: 0 0 100px 0;
+            font-size: 60px;
+            margin: 0 0 60px 0;
+            word-break: break-word;
           }
+  
           .right-column div {
-            font-size: 50px;
-            margin: 0 250px 0 0;
+            font-size: 36px;
+            margin: 0 50px 20px 0;
           }
+  
           .warehouse-ids {
             font-size: 24px;
             margin-bottom: 20px;
           }
+  
           .warehouse-id {
             margin-right: 10px;
             display: inline-block;
           }
+  
           .qr-img {
             width: 180px;
             height: auto;
           }
+  
           .watermark {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(-30deg);
-            font-size: 600px;
+            font-size: 400px;
             font-weight: 900;
             color: rgba(0, 0, 0, 0.04);
             z-index: 0;
@@ -162,7 +187,7 @@ export default function Dashboard() {
         </style>
       `;
   
-      const printWindow = window.open('', '_blank', 'width=800,height=600');
+      const printWindow = window.open('', '_blank', 'width=1024,height=1366');
       if (!printWindow) throw new Error('无法打开打印窗口');
   
       printWindow.document.open();
@@ -170,6 +195,7 @@ export default function Dashboard() {
         <html>
           <head>
             <title>打印二维码</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
             ${style}
           </head>
           <body onload="window.print(); window.close();">
