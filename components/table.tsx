@@ -70,130 +70,123 @@ export default function Dashboard() {
   );
 
   const totalPages = Math.ceil(filteredDashboard.length / itemsPerPage);
-  const handlePrint = async (item: any) =>  {
-    const res = await getWarehouseList(item.destination_warehouse)
-    const data = await res.json();
-    const list: { id: string , name: string}[] = data.list
-    const qrImage = await QRCode.toDataURL(item.id);
-    if (!list) return;
+  const handlePrint = async (item: any) => {
     try {
-      const iframe = document.createElement("iframe");
-      iframe.style.position = "fixed";
-      iframe.style.right = "0";
-      iframe.style.bottom = "0";
-      iframe.style.width = "0";
-      iframe.style.height = "0";
-      iframe.style.border = "0";
-      document.body.appendChild(iframe);
+      const res = await getWarehouseList(item.destination_warehouse);
+      const data = await res.json();
+      const list: { id: string, name: string }[] = data.list;
+  
+      if (!list || list.length === 0) return;
+  
+      const qrImage = await QRCode.toDataURL(item.id);
   
       const printContent = `
-      <div class="qr-container">
-        <div class="watermark">JFK</div>
-        <div class="content-row">
-          <div class="left-column">${list[0].name}</div>
-          
-          <div class="right-column">
-            <p>G-ID: ${item.date}-${item.destination_warehouse}-${item.box_id}</p>
-            <div class="warehouse-ids">
-              ${list?.map(w => `<span class="warehouse-id">${w.id}</span>`).join(' ') ?? ''}
+        <div class="qr-container">
+          <div class="watermark">JFK</div>
+          <div class="content-row">
+            <div class="left-column">${list[0].name}</div>
+            <div class="right-column">
+              <p>G-ID: ${item.date}-${item.destination_warehouse}-${item.box_id}</p>
+              <div class="warehouse-ids">
+                ${list.map(w => `<span class="warehouse-id">${w.id}</span>`).join(' ')}
+              </div>
+              <img src="${qrImage}" alt="QR Code" class="qr-img" />
             </div>
-            <img src="${qrImage}" alt="QR Code" class="qr-img" />
           </div>
         </div>
-      </div>
-    `;
-      
-    const doc = iframe.contentWindow?.document;
-    doc?.open();
-    doc?.write(`
-      <html>
-        <head>
-          <title>Print QR Code</title>
-          <style>
-            body {
-              margin: 0;
-              font-family: Arial, sans-serif;
-            }
-            .qr-container {
-              position: relative;
-              width: 100%;
-              height: 100vh;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-            }
-            .content-row {
-              display: flex;
-              width: 90%;
-              justify-content: space-between;
-              align-items: center;
-            }
-            .left-column {
-              writing-mode: vertical-rl;
-              text-orientation: upright;
-              font-size: 200px;
-              font-weight: bold;
-              color: #222;
-            }
-            .right-column {
-              text-align: right;
-            }
-            .right-column p {
-              font-size: 90px;
-              margin: 0 0 100px 0;
-            }
-            .right-column div{
-              font-size: 50px;
-              margin: 0 250px 0 0;
-            }
-            .warehouse-ids {
-              font-size: 24px;
-              margin-bottom: 20px;
-            }
-            .warehouse-id {
-              margin-right: 10px;
-              display: inline-block;
-            }
-            .qr-img {
-              width: 180px;
-              height: auto;
-            }
-            .watermark {
-              position: fixed; /* 改为 fixed，覆盖整页 */
-              top: 50%;
-              left: 50%;
-              transform: translate(-50%, -50%) rotate(-30deg);
-              font-size: 600px;
-              font-weight: 900;
-              color: rgba(0, 0, 0, 0.04); /* 更淡，更像背景 */
-              z-index: 0;
-              pointer-events: none;
-              user-select: none;
-              white-space: nowrap;
-            }
-          </style>
-        </head>
-        <body>
-          ${printContent}
-        </body>
-      </html>
-    `);
-    doc?.close();
-    
-
-      iframe.onload = () => {
-        setTimeout(() => {
-          iframe.contentWindow?.focus();
-          iframe.contentWindow?.print();
-        }, 500);
-      };
+      `;
+  
+      const style = `
+        <style>
+          body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+          }
+          .qr-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          .content-row {
+            display: flex;
+            width: 90%;
+            justify-content: space-between;
+            align-items: center;
+          }
+          .left-column {
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+            font-size: 200px;
+            font-weight: bold;
+            color: #222;
+          }
+          .right-column {
+            text-align: right;
+          }
+          .right-column p {
+            font-size: 90px;
+            margin: 0 0 100px 0;
+          }
+          .right-column div {
+            font-size: 50px;
+            margin: 0 250px 0 0;
+          }
+          .warehouse-ids {
+            font-size: 24px;
+            margin-bottom: 20px;
+          }
+          .warehouse-id {
+            margin-right: 10px;
+            display: inline-block;
+          }
+          .qr-img {
+            width: 180px;
+            height: auto;
+          }
+          .watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 600px;
+            font-weight: 900;
+            color: rgba(0, 0, 0, 0.04);
+            z-index: 0;
+            pointer-events: none;
+            user-select: none;
+            white-space: nowrap;
+          }
+        </style>
+      `;
+  
+      const printWindow = window.open('', '_blank', 'width=800,height=600');
+      if (!printWindow) throw new Error('无法打开打印窗口');
+  
+      printWindow.document.open();
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>打印二维码</title>
+            ${style}
+          </head>
+          <body onload="window.print(); window.close();">
+            ${printContent}
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+  
     } catch (err) {
-      setError("Failed");
-      console.error("Error:", err);
-    } finally{
+      setError("打印失败");
+      console.error("打印出错:", err);
+    } finally {
       setError("");
     }
   };
+  
   
 
   return (
