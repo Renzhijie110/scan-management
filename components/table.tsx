@@ -74,7 +74,7 @@ export default function Dashboard() {
     try {
       const res = await getWarehouseList(item.destination_warehouse);
       const data = await res.json();
-      const list: { id: string, name: string }[] = data.list;
+      const list: { id: string; name: string }[] = data.list;
   
       if (!list || list.length === 0) return;
   
@@ -100,83 +100,74 @@ export default function Dashboard() {
         <style>
           @page {
             size: A4 landscape;
-            margin: 10mm;
+            margin: 0mm;
           }
-  
           html, body {
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: white;
             width: 100%;
             height: 100%;
-            background: white;
           }
-  
+          @media print {
+            body {
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+          }
           .qr-container {
-            position: relative;
-            width: 100%;
-            height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-sizing: border-box;
+            height: 100vh;
             padding: 20px;
+            box-sizing: border-box;
           }
-  
           .content-row {
             display: flex;
             width: 100%;
             justify-content: space-between;
             align-items: center;
           }
-  
           .left-column {
             writing-mode: vertical-rl;
             text-orientation: upright;
-            font-size: 160px; /* 小一点适配iPad */
+            font-size: 8vw;
             font-weight: bold;
             color: #222;
             flex-shrink: 0;
           }
-  
           .right-column {
             text-align: right;
             max-width: 70%;
-            box-sizing: border-box;
           }
-  
           .right-column p {
-            font-size: 60px;
-            margin: 0 0 60px 0;
-            word-break: break-word;
+            font-size: 4vw;
+            margin: 0 0 3vw 0;
           }
-  
           .right-column div {
-            font-size: 36px;
-            margin: 0 50px 20px 0;
+            font-size: 2.5vw;
+            margin: 0 3vw 2vw 0;
           }
-  
           .warehouse-ids {
-            font-size: 24px;
-            margin-bottom: 20px;
+            font-size: 2vw;
+            margin-bottom: 2vw;
           }
-  
           .warehouse-id {
-            margin-right: 10px;
+            margin-right: 1vw;
             display: inline-block;
           }
-  
           .qr-img {
             width: 180px;
             height: auto;
           }
-  
           .watermark {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(-30deg);
-            font-size: 400px;
+            font-size: 35vw;
             font-weight: 900;
             color: rgba(0, 0, 0, 0.04);
             z-index: 0;
@@ -194,17 +185,16 @@ export default function Dashboard() {
       printWindow.document.write(`
         <html>
           <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
             <title>打印二维码</title>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
             ${style}
           </head>
-          <body onload="window.print(); window.close();">
+          <body onload="setTimeout(() => window.print(), 100); setTimeout(() => window.close(), 1000);">
             ${printContent}
           </body>
         </html>
       `);
       printWindow.document.close();
-  
     } catch (err) {
       setError("打印失败");
       console.error("打印出错:", err);
@@ -212,6 +202,7 @@ export default function Dashboard() {
       setError("");
     }
   };
+  
   
   
 
