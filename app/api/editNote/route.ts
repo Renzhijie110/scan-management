@@ -5,7 +5,7 @@ const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 export async function POST(request: Request) {
   try {
     const {item,comment} = await request.json();
-    const id = `${item.date}_${item.start_warehouse}`
+    const id = `${item.date}_${item.start_warehouse}_${item.destination_warehouse}`
 
     await sql`
     UPDATE "Pallet_Cluster"

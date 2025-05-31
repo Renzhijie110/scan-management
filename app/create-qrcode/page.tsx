@@ -82,125 +82,131 @@ export default function CreateQRCode() {
   };
   
   
-  const handlePrint = async () => {
+  const handlePrint = async () =>  {
     if (!qrCode) return;
   
     try {
-      const printContent = `
-        <div class="qr-container">
-          <div class="watermark">JFK</div>
-          <div class="content-row">
-            <div class="left-column">${warehouseList?.[0]?.name}</div>
-            <div class="right-column">
-              <p>G-ID: ${dateInput.slice(0, 8)}-${warehouseInput}-${boxId}</p>
-              <div class="warehouse-ids">
-                ${warehouseList?.map(w => `<span class="warehouse-id">${w.id}</span>`).join(' ') ?? ''}
-              </div>
-              <img src="${qrCode.qrImage}" alt="QR Code" class="qr-img" />
+      const iframe = document.createElement("iframe");
+      iframe.style.position = "fixed";
+      iframe.style.right = "0";
+      iframe.style.bottom = "0";
+      iframe.style.width = "0";
+      iframe.style.height = "0";
+      iframe.style.border = "0";
+      document.body.appendChild(iframe);
+  
+      const printContent = 
+      `<div class="qr-container">
+        <div class="watermark">JFK</div>
+        <div class="content-row">
+          <div class="left-column">${warehouseList?.[0]?.name}</div>
+          
+          <div class="right-column">
+            <p>G-ID: ${dateInput.slice(0, 8)}-${warehouseInput}-${boxId}</p>
+            <div class="warehouse-ids">
+              ${warehouseList?.map(w => `<span class="warehouse-id">${w.id}</span>`).join(' ') ?? ''}
             </div>
+            <img src="${qrCode.qrImage}" alt="QR Code" class="qr-img" />
           </div>
         </div>
-      `;
-  
-      const style = `
-        <style>
-          @page {
-            size: A4 landscape;
-            margin: 0;
-          }
-          body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-          }
-          .qr-container {
-            position: relative;
-            width: 100%;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
-          .content-row {
-            display: flex;
-            width: 90%;
-            justify-content: space-between;
-            align-items: center;
-          }
-          .left-column {
-            writing-mode: vertical-rl;
-            text-orientation: upright;
-            font-size: 200px;
-            font-weight: bold;
-            color: #222;
-          }
-          .right-column {
-            text-align: right;
-          }
-          .right-column p {
-            font-size: 90px;
-            margin: 0 0 100px 0;
-          }
-          .right-column div {
-            font-size: 50px;
-            margin: 0 250px 0 0;
-          }
-          .warehouse-ids {
-            font-size: 24px;
-            margin-bottom: 20px;
-          }
-          .warehouse-id {
-            margin-right: 10px;
-            display: inline-block;
-          }
-          .qr-img {
-            width: 180px;
-            height: auto;
-          }
-          .watermark {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-30deg);
-            font-size: 600px;
-            font-weight: 900;
-            color: rgba(0, 0, 0, 0.04);
-            z-index: 0;
-            pointer-events: none;
-            user-select: none;
-            white-space: nowrap;
-          }
-        </style>
-      `;
-  
-      const printWindow = window.open('', '_blank', 'width=800,height=600');
-      if (!printWindow) throw new Error('Unable to open print window');
-  
-      printWindow.document.open();
-      printWindow.document.write(`
-        <html>
-          <head>
-            <title>Print QR Code</title>
-            ${style}
-          </head>
-          <body onload="window.print(); window.close();">
-            ${printContent}
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
-  
+      </div>`
+    ;
+      
+    const doc = iframe.contentWindow?.document;
+    doc?.open();
+    doc?.write(`
+      <html>
+        <head>
+          <title>Print QR Code</title>
+          <style>
+            body {
+              margin: 0;
+              font-family: Arial, sans-serif;
+            }
+            .qr-container {
+              position: relative;
+              width: 100%;
+              height: 100vh;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+            .content-row {
+              display: flex;
+              width: 90%;
+              justify-content: space-between;
+              align-items: center;
+            }
+            .left-column {
+              writing-mode: vertical-rl;
+              text-orientation: upright;
+              font-size: 200px;
+              font-weight: bold;
+              color: #222;
+            }
+            .right-column {
+              text-align: right;
+            }
+            .right-column p {
+              font-size: 90px;
+              margin: 0 0 100px 0;
+            }
+            .right-column div{
+              font-size: 50px;
+              margin: 0 250px 0 0;
+            }
+            .warehouse-ids {
+              font-size: 24px;
+              margin-bottom: 20px;
+            }
+            .warehouse-id {
+              margin-right: 10px;
+              display: inline-block;
+            }
+            .qr-img {
+              width: 180px;
+              height: auto;
+            }
+            .watermark {
+              position: fixed; /* 改为 fixed，覆盖整页 */
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%) rotate(-30deg);
+              font-size: 600px;
+              font-weight: 900;
+              color: rgba(0, 0, 0, 0.04); /* 更淡，更像背景 */
+              z-index: 0;
+              pointer-events: none;
+              user-select: none;
+              white-space: nowrap;
+            }
+          </style>
+        </head>
+        <body>
+          ${printContent}
+        </body>
+      </html>`
+    );
+    doc?.close();
+    
+
+      iframe.onload = () => {
+        setTimeout(() => {
+          iframe.contentWindow?.focus();
+          iframe.contentWindow?.print();
+        }, 500);
+      };
     } catch (err) {
       setError("Failed");
       console.error("Error:", err);
-    } finally {
-      await createPallet(dateInput, selectedOptionsw, warehouseInput, boxId);
+    } finally{
+      await createPallet(dateInput,selectedOptionsw,warehouseInput,boxId)
       setWarehouseList([]);
       setWarehouseInput("");
       setQrCode(null);
       setError("");
     }
   };
-  
   
   
   
