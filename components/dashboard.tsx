@@ -31,6 +31,20 @@ export default function Dashboard() {
       setUnscannedLoading(false);
     }
   };
+  const handleScannedClick = async (date: string, start_warehouse: string, destination_warehouse: string) => {
+    setUnscannedLoading(true);
+    setShowDetailModal(true);
+    try {
+      const res = await fetch(`/api/scannedDetail?date=${date}&start_warehouse=${start_warehouse}&destination_warehouse=${destination_warehouse}`);
+      const data = await res.json();
+      setUnscannedDetail(data.boxes);
+    } catch (e) {
+      alert('加载未扫详情失败');
+      setUnscannedDetail(null);
+    } finally {
+      setUnscannedLoading(false);
+    }
+  };
   const fetchDashboard = async () => {
     try {
       setLoading(true);
@@ -108,7 +122,9 @@ export default function Dashboard() {
                       <td style={styles.td}>{row.start_warehouse}</td>
                       <td style={styles.td}>{row.destination_warehouse}</td>
                       <td style={styles.tdRight}>{row.total_pallet_count}</td>
-                      <td style={styles.tdRight}>{row.scan_pallet_count}</td>
+                      <td style={{ ...styles.tdRight, color: '#409eff', cursor: 'pointer' }}
+                          onClick={() => handleScannedClick(row.date,row.start_warehouse,row.destination_warehouse)}>
+                      {row.scan_pallet_count}</td>
                       <td style={{ ...styles.tdRight, color: '#409eff', cursor: 'pointer' }}
                           onClick={() => handleUnscannedClick(row.date,row.start_warehouse,row.destination_warehouse)}>
                         {row.unscanned_count}
