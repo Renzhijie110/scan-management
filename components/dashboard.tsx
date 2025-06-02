@@ -192,7 +192,7 @@ export default function Dashboard() {
                     <strong>起始仓:</strong> {item.start_warehouse} ➡
                     <strong>目的仓:</strong> {item.destination_warehouse}<br />
                     <strong>箱号:</strong> {item.box_id}<br />                    
-                    <strong>创建时间:</strong> {new Date(item.created_at).toLocaleString()}
+                    <strong>扫描时间:</strong> {new Date(item.scan_time).toLocaleString()}
                   </li>
                 ))}
               </ul>
