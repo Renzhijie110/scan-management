@@ -19,7 +19,7 @@ export default function SortingPage() {
         supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
         rememberLastUsedCamera: true,
         fps: 10,
-        qrbox: { width: 300, height: 300 },
+        qrbox: { width: 250, height: 250 },
       },
       false
     );
