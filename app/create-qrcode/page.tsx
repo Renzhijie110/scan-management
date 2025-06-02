@@ -152,15 +152,15 @@ export default function CreateQRCode() {
               margin: 0 0 100px 0;
             }
             .right-column div{
-              font-size: 50px;
+              font-size: 40px;
               margin: 0 250px 0 0;
             }
             .warehouse-ids {
-              font-size: 24px;
+              font-size: 10px;
               margin-bottom: 20px;
             }
             .warehouse-id {
-              margin-right: 10px;
+              margin-right: 5px;
               display: inline-block;
             }
             .qr-img {
