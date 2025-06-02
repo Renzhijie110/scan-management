@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import QRCode from 'qrcode';
-
 export default function Dashboard() {
   const [dashboard, setDashboard] = useState<any[]>([]);
   const [filteredDashboard, setFilteredDashboard] = useState<any[]>([]); // 这一行是对的
@@ -12,7 +11,6 @@ export default function Dashboard() {
   const [datePickerValue, setDatePickerValue] = useState(''); // YYYY-MM-DD格式
   const [dateInput, setDateInput] = useState("");
   const itemsPerPage = 10;
-
   useEffect(() => {
     const today = new Date();
     const yyyy = today.getFullYear();

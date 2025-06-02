@@ -181,7 +181,7 @@ export default function Dashboard() {
       {showDetailModal && (
         <div style={styles.modalOverlay}>
           <div style={styles.modalContent}>
-            <h3 style={styles.modalTitle}>未扫详情</h3>
+            <h3 style={styles.modalTitle}>扫描详情</h3>
             {unscannedLoading ? (
               <p>加载中...</p>
             ) : unscannedDetail ? (
