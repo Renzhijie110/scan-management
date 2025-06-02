@@ -110,6 +110,9 @@ export default function Dashboard() {
         <head>
           <title>Print QR Code</title>
           <style>
+            @page {
+              size: landscape;
+            }
             body {
               margin: 0;
               font-family: Arial, sans-serif;
@@ -143,7 +146,7 @@ export default function Dashboard() {
               margin: 0 0 100px 0;
             }
             .right-column div{
-              font-size: 50px;
+              font-size: 40px;
               margin: 0 250px 0 0;
             }
             .warehouse-ids {

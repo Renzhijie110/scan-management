@@ -119,6 +119,9 @@ export default function CreateQRCode() {
         <head>
           <title>Print QR Code</title>
           <style>
+            @page {
+              size: landscape;
+            }
             body {
               margin: 0;
               font-family: Arial, sans-serif;
@@ -156,11 +159,11 @@ export default function CreateQRCode() {
               margin: 0 250px 0 0;
             }
             .warehouse-ids {
-              font-size: 10px;
+              font-size: 24px;
               margin-bottom: 20px;
             }
             .warehouse-id {
-              margin-right: 5px;
+              margin-right: 10px;
               display: inline-block;
             }
             .qr-img {
