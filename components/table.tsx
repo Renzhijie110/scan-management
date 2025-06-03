@@ -9,6 +9,9 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [datePickerValue, setDatePickerValue] = useState(''); // YYYY-MM-DD格式
+  const [searchBoxId, setSearchBoxId] = useState('');
+  const [searchStartWarehouse, setSearchStartWarehouse] = useState('');
+  const [searchDestWarehouse, setSearchDestWarehouse] = useState('');
   const itemsPerPage = 10;
   useEffect(() => {
     const today = new Date();
@@ -74,12 +77,18 @@ export default function Dashboard() {
     }
 
   };
-  const pagedData = filteredDashboard.slice(
+  const filteredBySearch = filteredDashboard.filter((item) => {
+    const boxMatch = item.box_id?.toLowerCase().includes(searchBoxId.toLowerCase());
+    const startMatch = item.start_warehouse?.toString().toLowerCase().includes(searchStartWarehouse.toLowerCase());
+    const destMatch = item.destination_warehouse?.toString().toLowerCase().includes(searchDestWarehouse.toLowerCase());
+    return boxMatch && startMatch && destMatch;
+  });
+  const pagedData = filteredBySearch.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-
-  const totalPages = Math.ceil(filteredDashboard.length / itemsPerPage);
+  
+  const totalPages = Math.ceil(filteredBySearch.length / itemsPerPage);
   const handlePrint = async (item: any) =>  {
     var list: { id: string , name: string}[]
     if(Number(item.start_warehouse) === 17){
@@ -221,15 +230,35 @@ export default function Dashboard() {
   return (
     <div style={styles.container}>
       <h2 style={styles.title}>Admin</h2>
-      <div style={{ marginBottom: 16, textAlign: 'center' }}>
-      <input
-                id="date-picker"
-                type="date"
-                value={datePickerValue}
-                onChange={handleDateChange}
-                className="w-full px-5 py-4 border border-gray-300 rounded-lg text-xl focus:outline-none focus:ring-4 focus:ring-blue-300"
-              />
-
+      <div className="flex flex-wrap justify-left gap-10 mb-6">
+        <input
+          id="date-picker"
+          type="date"
+          value={datePickerValue}
+          onChange={handleDateChange}
+          className="w-60 px-5 py-3 border border-gray-300 rounded-2xl text-lg focus:outline-none focus:ring-4 focus:ring-blue-200 shadow-sm transition-all duration-200"
+        />
+        <input
+          type="text"
+          placeholder="搜索 Box ID"
+          value={searchBoxId}
+          onChange={(e) => setSearchBoxId(e.target.value)}
+          className="w-60 px-5 py-3 border border-gray-300 rounded-2xl text-lg focus:outline-none focus:ring-4 focus:ring-blue-200 shadow-sm transition-all duration-200"
+        />
+        <input
+          type="text"
+          placeholder="搜索起始仓"
+          value={searchStartWarehouse}
+          onChange={(e) => setSearchStartWarehouse(e.target.value)}
+          className="w-60 px-5 py-3 border border-gray-300 rounded-2xl text-lg focus:outline-none focus:ring-4 focus:ring-blue-200 shadow-sm transition-all duration-200"
+        />
+        <input
+          type="text"
+          placeholder="搜索目的仓"
+          value={searchDestWarehouse}
+          onChange={(e) => setSearchDestWarehouse(e.target.value)}
+          className="w-60 px-5 py-3 border border-gray-300 rounded-2xl text-lg focus:outline-none focus:ring-4 focus:ring-blue-200 shadow-sm transition-all duration-200"
+        />
       </div>
 
       {loading && <p style={styles.tip}>加载中...</p>}
