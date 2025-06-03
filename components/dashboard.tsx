@@ -11,6 +11,8 @@ export default function Dashboard() {
   const [unscannedDetail, setUnscannedDetail] = useState<any[] | null>(null);
   const [unscannedLoading, setUnscannedLoading] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [filterDate, setFilterDate] = useState('');
+  const [filterStart, setFilterStart] = useState('');
   const itemsPerPage = 10;
 
   useEffect(() => {
@@ -92,7 +94,25 @@ export default function Dashboard() {
       }
     }
   };
+  const handleFilter = () => {
+    const formattedDate = filterDate
+      ? filterDate.replace(/-/g, '') // 从 '2024-05-31' 得到 '240531'
+      : '';
   
+    const filtered = dashboard.filter(item =>
+      (!filterDate || item.date === formattedDate) &&
+      (!filterStart || item.start_warehouse.includes(filterStart))
+    );
+  
+    setFilteredDashboard(filtered);
+    setCurrentPage(1);
+  };
+  const handleReset = () => {
+    setFilterDate('');
+    setFilterStart('');
+    setFilteredDashboard(dashboard);
+    setCurrentPage(1);
+  };
 
   return (
     <div style={styles.container}>
@@ -102,6 +122,24 @@ export default function Dashboard() {
       {!loading && !error && (
         <>
           <div style={styles.card}>
+          <div style={{ marginBottom: 20, display: 'flex', gap: 12, alignItems: 'center' }}>
+            <input
+              type="date"
+              value={filterDate}
+              onChange={(e) => setFilterDate(e.target.value)}
+              style={styles.input}
+              placeholder="筛选日期"
+            />
+            <input
+              value={filterStart}
+              onChange={(e) => setFilterStart(e.target.value)}
+              style={styles.input}
+              placeholder="起始仓"
+            />
+            <button style={styles.btnPrimary} onClick={handleFilter}>Filter</button>
+            <button style={styles.btnGray} onClick={handleReset}>Reset</button>
+          </div>
+
             <table style={styles.table}>
               <thead style={styles.tableHead}>
                 <tr>
