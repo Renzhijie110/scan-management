@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
 import Logo from '@/components/Logo';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function Navbar() {
@@ -19,10 +19,9 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* 左侧：Logo + 标题 */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center">
             <Logo />
-            <span className="hidden sm:inline text-xl font-semibold text-gray-800">
-              
+            <span style={{ marginLeft: '-50px' }} className="hidden sm:inline text-xl font-semibold text-gray-800">
               Pallet Tracking System
             </span>
           </div>

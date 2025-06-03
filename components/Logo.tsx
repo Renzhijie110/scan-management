@@ -8,7 +8,7 @@ export default function Logo() {
             x="0px"
             y="0px"
             viewBox="0 0 220 71.52"
-            className="w-[150px] h-auto"
+            className="w-[120px] h-auto"
             xmlSpace="preserve"
           >
             <style type="text/css">
