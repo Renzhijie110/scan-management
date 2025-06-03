@@ -58,7 +58,7 @@ export default function SortingPage() {
         setMessage(`${itemId} 分拣扫描成功`);
         setTimeout(() => {
           setScanningInProgress(false); // 扫描完成后重置
-          router.push('/sorting');
+          router.push('/scan');
         }, 3000);
       } else {
         throw new Error('扫描失败');
