@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef} from 'react';
+import { useEffect, useState} from 'react';
 import { Html5QrcodeScanner, Html5QrcodeScanType} from 'html5-qrcode';
 import { useRouter } from 'next/navigation';
 
@@ -9,9 +9,7 @@ export default function SortingPage() {
   const [message, setMessage] = useState('');
   const router = useRouter();
   const [scanningInProgress, setScanningInProgress] = useState(false); // 防止重复扫描
-  const scannerRef = useRef<Html5QrcodeScanner | null>(null);
-  const scanningInProgressRef = useRef(false);  // 直接用 ref 代替 state 防止重复渲染
-  const errorTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
     const scanner = new Html5QrcodeScanner(
       "reader",
@@ -23,25 +21,24 @@ export default function SortingPage() {
       },
       false
     );
-    scannerRef.current = scanner;
 
     scanner.render(
-      async (decodedText) => {
-        if (!scanningInProgressRef.current) {
-          scanningInProgressRef.current = true;
-          await handleScan(decodedText);
+      (decodedText) => {
+        const itemId = decodedText;
+        if (itemId && !scanningInProgress) { // 如果没有扫描进行中
+          handleScan(itemId);
         }
       },
       (errorMessage) => {
-          console.warn(errorMessage);
+        console.warn(errorMessage);
       }
     );
 
     return () => {
-      if (errorTimeoutRef.current) clearTimeout(errorTimeoutRef.current);
       scanner.clear();
     };
-  }, []);
+  }, [scanningInProgress]);
+
   const handleScan = async (itemId: string) => {
     setScanningInProgress(true); // 标记扫描开始
     setStatus('scanning');
@@ -52,7 +49,7 @@ export default function SortingPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          item_id: itemId,
+          item_id: itemId
         }),
       });
 
@@ -61,7 +58,7 @@ export default function SortingPage() {
         setMessage(`${itemId} 分拣扫描成功`);
         setTimeout(() => {
           setScanningInProgress(false); // 扫描完成后重置
-          router.push('/scan');
+          router.push('/sorting');
         }, 3000);
       } else {
         throw new Error('扫描失败');
@@ -76,11 +73,11 @@ export default function SortingPage() {
   return (
     <main className="min-h-screen p-8">
       <div className="max-w-md mx-auto">
-        <h1 className="text-2xl font-bold mb-6">Pallet Scan</h1>
+        <h1 className="text-2xl font-bold mb-6">分拣扫描</h1>
 
         <div className="bg-white rounded-lg shadow p-6">
           <div className="mb-4">
-            <p className="text-gray-600 text-center">Please align the QR code with the scanning camera</p>
+            <p className="text-gray-600 text-center">请将二维码对准扫描框</p>
           </div>
 
           <div id="reader" className="mb-4"></div>
