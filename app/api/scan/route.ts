@@ -9,10 +9,10 @@ export async function POST(request: Request) {
 
     // 使用 PostgreSQL 内置的当前时间函数 NOW()
     await sql`
-      UPDATE "Pallet"
-      SET scan_time = NOW()
-      WHERE id = ${item_id}
-    `;
+    UPDATE "Pallet"
+    SET scan_time = (NOW() AT TIME ZONE 'UTC') AT TIME ZONE 'America/New_York'
+    WHERE id = ${item_id}
+  `;
 
     return NextResponse.json({ id: item_id });
   } catch (error) {
