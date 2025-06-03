@@ -14,6 +14,9 @@ export default function CreateQRCode() {
   const [error, setError] = useState('');
   const [boxId, setBoxId] = useState(0);
   const [datePickerValue, setDatePickerValue] = useState(''); // YYYY-MM-DD格式
+  const [qrloading, setQRLoading] = useState(false);
+  const [printloading, setPrintloading] = useState(false);
+
   useEffect(() => {
     const today = new Date();
     // 设置默认日期选择器值格式 YYYY-MM-DD
@@ -55,6 +58,11 @@ export default function CreateQRCode() {
       setError("Please enter all fields: Date, Warehouse (^_^)");
       return;
     }
+    if (isNaN(Number(warehouseInput))) {
+      const pallet_group_id = `${dateInput}_${selectedOptionsw}_${warehouseInput}`;
+      setError(`GID Wrong Format: ${pallet_group_id} (^_^)`);
+      return;
+    }
     var list
     if(selectedOptionsw === 17){
       const res = await getWarehouseList(warehouseInput);
@@ -70,16 +78,11 @@ export default function CreateQRCode() {
       setError("Invalid Warehouse Number");
       return;
     }
-    
+    setQRLoading(true)
     setWarehouseList(list);  // 设置状态
 
     try {
       const pallet_group_id = `${dateInput}_${selectedOptionsw}_${warehouseInput}`;
-      if (!warehouseInput || isNaN(Number(warehouseInput))) {
-        setError(`GID Wrong Format: ${pallet_group_id} (^_^)`);
-        return;
-      }
-  
       const response = await getPalletMax(pallet_group_id);
       const data = await response.json();
       const boxId = data.length + 1
@@ -92,6 +95,8 @@ export default function CreateQRCode() {
     } catch (err) {
       setError("Failed");
       console.error("Error:", err);
+    } finally{
+      setQRLoading(false)
     }
   };
   
@@ -109,7 +114,7 @@ export default function CreateQRCode() {
       setError("请确保所有输入项都已填写并生成二维码");
       return;
     }
-  
+    setPrintloading(true)
     try {
       const iframe = document.createElement("iframe");
       iframe.style.position = "fixed";
@@ -233,6 +238,7 @@ export default function CreateQRCode() {
       setWarehouseInput("");
       setQrCode(null);
       setError("");
+      setPrintloading(false)
     }
   };
   
@@ -304,9 +310,10 @@ export default function CreateQRCode() {
     
             <button
               onClick={generateQRCode}
+              disabled={qrloading}
               className="w-full bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold text-2xl py-4 rounded-lg shadow-md hover:from-blue-700 hover:to-blue-500 transition"
             >
-              Generate QR Codes
+              {qrloading ? 'Generating...' : 'Generate QR Codes'}
             </button>
           </div>
     
@@ -322,9 +329,10 @@ export default function CreateQRCode() {
               </div>
               <button
                 onClick={handlePrint}
+                disabled={printloading}
                 className="mt-10 bg-gradient-to-r from-green-600 to-green-400 text-white font-bold text-2xl py-4 rounded-lg shadow-md hover:from-green-700 hover:to-green-500 transition"
               >
-                Print Pallet Label
+                {printloading ? 'Printing...' : 'Print Pallet Label'}       
               </button>
             </div>
           )}
