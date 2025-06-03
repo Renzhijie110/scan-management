@@ -12,7 +12,8 @@ export default function Dashboard() {
   const [unscannedLoading, setUnscannedLoading] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [filterDate, setFilterDate] = useState('');
-  const [filterStart, setFilterStart] = useState('');
+  const [searchStartWarehouse, setSearchStartWarehouse] = useState('');
+  const [searchDestWarehouse, setSearchDestWarehouse] = useState('');
   const itemsPerPage = 10;
 
   useEffect(() => {
@@ -60,12 +61,19 @@ export default function Dashboard() {
     }
   };
 
-  const pagedData = filteredDashboard.slice(
+  const filteredBySearch = filteredDashboard.filter((item) => {
+    const dateMatch = item.date?.toLowerCase().includes(filterDate.toLowerCase());
+    const startMatch = item.start_warehouse?.toString().toLowerCase().includes(searchStartWarehouse.toLowerCase());
+    const destMatch = item.destination_warehouse?.toString().toLowerCase().includes(searchDestWarehouse.toLowerCase());
+    return dateMatch && startMatch && destMatch;
+  });
+  const pagedData = filteredBySearch.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-
-  const totalPages = Math.ceil(filteredDashboard.length / itemsPerPage);
+  
+  
+  const totalPages = Math.ceil(filteredBySearch.length / itemsPerPage);
 
   const startEdit = (index: number) => {
     setEditingNote({ id: index, comment: dashboard[index].comment || '' });
@@ -94,25 +102,7 @@ export default function Dashboard() {
       }
     }
   };
-  const handleFilter = () => {
-    const formattedDate = filterDate
-      ? filterDate.replace(/-/g, '') // 从 '2024-05-31' 得到 '240531'
-      : '';
-  
-    const filtered = dashboard.filter(item =>
-      (!filterDate || item.date === formattedDate) &&
-      (!filterStart || item.start_warehouse.includes(filterStart))
-    );
-  
-    setFilteredDashboard(filtered);
-    setCurrentPage(1);
-  };
-  const handleReset = () => {
-    setFilterDate('');
-    setFilterStart('');
-    setFilteredDashboard(dashboard);
-    setCurrentPage(1);
-  };
+
 
   return (
     <div style={styles.container}>
@@ -124,20 +114,27 @@ export default function Dashboard() {
           <div style={styles.card}>
           <div style={{ marginBottom: 20, display: 'flex', gap: 12, alignItems: 'center' }}>
             <input
-              type="date"
+              type="text"
               value={filterDate}
               onChange={(e) => setFilterDate(e.target.value)}
-              style={styles.input}
-              placeholder="筛选日期"
+              placeholder="搜索日期(YYYYMMDD)"
+              className="w-60 px-5 py-3 border border-gray-300 rounded-2xl text-lg focus:outline-none focus:ring-4 focus:ring-blue-200 shadow-sm transition-all duration-200"
+              pattern="\d{8}"
             />
             <input
-              value={filterStart}
-              onChange={(e) => setFilterStart(e.target.value)}
-              style={styles.input}
-              placeholder="起始仓"
+              type="text"
+              placeholder="搜索起始仓"
+              value={searchStartWarehouse}
+              onChange={(e) => setSearchStartWarehouse(e.target.value)}
+              className="w-60 px-5 py-3 border border-gray-300 rounded-2xl text-lg focus:outline-none focus:ring-4 focus:ring-blue-200 shadow-sm transition-all duration-200"
             />
-            <button style={styles.btnPrimary} onClick={handleFilter}>Filter</button>
-            <button style={styles.btnGray} onClick={handleReset}>Reset</button>
+            <input
+              type="text"
+              placeholder="搜索目的仓"
+              value={searchDestWarehouse}
+              onChange={(e) => setSearchDestWarehouse(e.target.value)}
+              className="w-60 px-5 py-3 border border-gray-300 rounded-2xl text-lg focus:outline-none focus:ring-4 focus:ring-blue-200 shadow-sm transition-all duration-200"
+            />
           </div>
 
             <table style={styles.table}>
