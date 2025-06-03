@@ -105,7 +105,10 @@ export default function CreateQRCode() {
     }
   }
   const handlePrint = async () =>  {
-    if (!qrCode) return;
+    if (!qrCode || !dateInput || !selectedOptionsw || !warehouseInput || !boxId) {
+      setError("请确保所有输入项都已填写并生成二维码");
+      return;
+    }
   
     try {
       const iframe = document.createElement("iframe");

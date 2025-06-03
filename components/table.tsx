@@ -221,7 +221,6 @@ export default function Dashboard() {
     }
   };
   
-  
 
   return (
     <div style={styles.container}>
@@ -261,7 +260,7 @@ export default function Dashboard() {
                   <td style={styles.td}>{item.destination_warehouse}</td>
                   <td style={styles.td}>{item.created_at}</td>
                   <td style={styles.td}>
-                    <button onClick={() => handlePrint(item)}>Print</button>
+                    <button onClick={() => handlePrint(item)}style={styles.btnGray}>Print</button>
                   </td>
                 </tr>
               ))}
@@ -414,5 +413,5 @@ const styles: Record<string, React.CSSProperties> = {
   pageText: {
     color: '#666',
     fontSize: 14,
-  },
+  }
 };
