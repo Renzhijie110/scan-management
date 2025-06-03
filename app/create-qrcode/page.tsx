@@ -205,9 +205,9 @@ export default function CreateQRCode() {
               top: 50%;
               left: 50%;
               transform: translate(-50%, -50%) rotate(-30deg);
-              font-size: 600px;
+              font-size: 500px;
               font-weight: 900;
-              color: rgba(0, 0, 0, 0.04); /* 更淡，更像背景 */
+              color: rgba(0, 0, 0, 0.03); /* 更淡，更像背景 */
               z-index: 0;
               pointer-events: none;
               user-select: none;

@@ -17,7 +17,8 @@ export async function GET() {
       FROM "Pallet_Cluster" pc
       LEFT JOIN "Pallet" p ON p.pallet_group_id = pc.id
       GROUP BY pc.id,p.date,p.start_warehouse,p.destination_warehouse, pc.comment
-      ORDER BY p.date DESC;
+      ORDER BY p.date DESC
+      LIMIT 100;
     `;
     
     return NextResponse.json(dashboard);

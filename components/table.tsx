@@ -3,13 +3,12 @@
 import { useState, useEffect } from 'react';
 import QRCode from 'qrcode';
 export default function Dashboard() {
-  const [dashboard, setDashboard] = useState<any[]>([]);
+
   const [filteredDashboard, setFilteredDashboard] = useState<any[]>([]); // 这一行是对的
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [datePickerValue, setDatePickerValue] = useState(''); // YYYY-MM-DD格式
-  const [dateInput, setDateInput] = useState("");
   const itemsPerPage = 10;
   useEffect(() => {
     const today = new Date();
@@ -19,19 +18,16 @@ export default function Dashboard() {
     const formattedPickerDate = `${yyyy}-${mm}-${dd}`;
     const formattedDateInput = `${yyyy}${mm}${dd}`;
     setDatePickerValue(formattedPickerDate);
-    setDateInput(formattedDateInput);
     fetchDashboard(formattedDateInput); // ✅ 初始化加载
   }, []);
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value; // 格式 YYYY-MM-DD
     setDatePickerValue(val);
     if (!val) {
-      setDateInput('');
       return;
     }
     const [yyyy, mm, dd] = val.split('-');
     const yyyymmdd = `${yyyy}${mm}${dd}`;
-    setDateInput(yyyymmdd);
     fetchDashboard(yyyymmdd); // ✅ 直接用新值
   };
   const fetchDashboard = async (yyyymmdd = '') => {
@@ -42,11 +38,11 @@ export default function Dashboard() {
       const data = await response.json();
   
       if (Array.isArray(data.data)) {
-        setDashboard(data.data);
+
         setFilteredDashboard(data.data);
       } else {
         console.error('接口返回非数组', data.data);
-        setDashboard([]);
+
         setFilteredDashboard([]);
       }
     } catch (e) {
@@ -189,9 +185,9 @@ export default function Dashboard() {
               top: 50%;
               left: 50%;
               transform: translate(-50%, -50%) rotate(-30deg);
-              font-size: 600px;
+              font-size: 500px;
               font-weight: 900;
-              color: rgba(0, 0, 0, 0.04); /* 更淡，更像背景 */
+              color: rgba(0, 0, 0, 0.03); /* 更淡，更像背景 */
               z-index: 0;
               pointer-events: none;
               user-select: none;

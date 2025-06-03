@@ -1,5 +1,4 @@
 'use client';
-
 import { useState, useEffect } from 'react';
 
 export default function Dashboard() {
@@ -15,7 +14,7 @@ export default function Dashboard() {
   const itemsPerPage = 10;
 
   useEffect(() => {
-    fetchDashboard();
+    fetchDashboard()
   }, []);
   const handleUnscannedClick = async (date: string, start_warehouse: string, destination_warehouse: string) => {
     setUnscannedLoading(true);
@@ -48,7 +47,7 @@ export default function Dashboard() {
   const fetchDashboard = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/dashboard');
+      const response = await fetch(`/api/dashboard`);
       const data = await response.json();
       setDashboard(data);
       setFilteredDashboard(data);
@@ -97,8 +96,6 @@ export default function Dashboard() {
 
   return (
     <div style={styles.container}>
-      <h2 style={styles.title}>Pallet Dashboard</h2>
-
       {loading && <p style={styles.tip}>加载中...</p>}
       {error && <p style={{ ...styles.tip, color: 'crimson' }}>{error}</p>}
 
