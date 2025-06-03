@@ -33,13 +33,7 @@ export default function SortingPage() {
         }
       },
       (errorMessage) => {
-        // 这里做一个简单节流，避免控制台频繁报错
-        if (!errorTimeoutRef.current) {
           console.warn(errorMessage);
-          errorTimeoutRef.current = setTimeout(() => {
-            errorTimeoutRef.current = null;
-          }, 1000); // 1秒内只打印一次错误
-        }
       }
     );
 
