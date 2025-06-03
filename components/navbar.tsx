@@ -30,7 +30,6 @@ export default function Navbar() {
           {/* 桌面导航 */}
           <div className="hidden sm:flex sm:space-x-8">
             <NavLink href="/create-qrcode" currentPath={pathname} label="Generate QR Code" />
-            <NavLink href="/scan" currentPath={pathname} label="Scan" />  
             <NavLink href="/dashboard" currentPath={pathname} label="Dashboard" />
           </div>
 

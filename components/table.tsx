@@ -62,6 +62,22 @@ export default function Dashboard() {
       headers: { "Content-Type": "application/json" },
     });
   };
+  const getWarehouseList_181 = async (warehouseInput: string): Promise<Response> => {
+    return await fetch(`/api/getWarehouseList_181?warehouseInput=${warehouseInput}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+  };
+  const getWarehouse = (input: number) => {
+    if(input === 17){
+      return "JFK"
+    }else if(input === 181){
+      return "NJ25"
+    }else{
+      return
+    }
+
+  };
   const pagedData = filteredDashboard.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -69,11 +85,20 @@ export default function Dashboard() {
 
   const totalPages = Math.ceil(filteredDashboard.length / itemsPerPage);
   const handlePrint = async (item: any) =>  {
-    const res = await getWarehouseList(item.destination_warehouse)
-    const data = await res.json();
-    const list: { id: string , name: string}[] = data.list
+    var list: { id: string , name: string}[]
+    if(Number(item.start_warehouse) === 17){
+      const res = await getWarehouseList(item.destination_warehouse);
+      const data = await res.json();
+      list = data.list;
+    }else if(Number(item.start_warehouse) === 181){
+      const res = await getWarehouseList_181(item.destination_warehouse);
+      const data = await res.json();
+      list = data.list;
+    }else{
+      return
+    }
+
     const qrImage = await QRCode.toDataURL(item.id);
-    if (!list) return;
     try {
       const iframe = document.createElement("iframe");
       iframe.style.position = "fixed";
@@ -86,7 +111,7 @@ export default function Dashboard() {
   
       const printContent = `
       <div class="qr-container">
-        <div class="watermark">JFK</div>
+        <div class="watermark">${getWarehouse(Number(item.start_warehouse))}</div>
         <div class="content-row">
           <div class="left-column">${list[0].name}</div>
           

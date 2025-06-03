@@ -10,7 +10,7 @@ export default function CreateQRCode() {
   const [warehouseList, setWarehouseList] = useState<{ id: string; name: string }[] | null>(null);
   const [dateInput, setDateInput] = useState("");
   const [warehouseInput, setWarehouseInput] = useState('');
-  const [selectedOptionsw, setSelectedOptionsw] = useState<17>(17);
+  const [selectedOptionsw, setSelectedOptionsw] = useState<17 | 181>(17);
   const [error, setError] = useState('');
   const [boxId, setBoxId] = useState(0);
   const [datePickerValue, setDatePickerValue] = useState(''); // YYYY-MM-DD格式
@@ -43,14 +43,28 @@ export default function CreateQRCode() {
       headers: { "Content-Type": "application/json" },
     });
   };
+  const getWarehouseList_181 = async (warehouseInput: string): Promise<Response> => {
+    return await fetch(`/api/getWarehouseList_181?warehouseInput=${warehouseInput}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+  };
+
   const generateQRCode = async () => {
     if (!selectedOptionsw || !dateInput || !warehouseInput) {
       setError("Please enter all fields: Date, Warehouse (^_^)");
       return;
     }
-    const res = await getWarehouseList(warehouseInput);
-    const data = await res.json();
-    const list = data.list;
+    var list
+    if(selectedOptionsw === 17){
+      const res = await getWarehouseList(warehouseInput);
+      const data = await res.json();
+      list = data.list;
+    }else if(selectedOptionsw === 181){
+      const res = await getWarehouseList_181(warehouseInput);
+      const data = await res.json();
+      list = data.list;
+    }
     
     if (list.length === 0) {
       setError("Invalid Warehouse Number");
@@ -81,7 +95,15 @@ export default function CreateQRCode() {
     }
   };
   
-  
+  const getWarehouse = (input: number) => {
+    if(input === 17){
+      return "JFK"
+    }else if(input === 181){
+      return "NJ25"
+    }else{
+      return
+    }
+  }
   const handlePrint = async () =>  {
     if (!qrCode) return;
   
@@ -97,7 +119,7 @@ export default function CreateQRCode() {
   
       const printContent = 
       `<div class="qr-container">
-        <div class="watermark">JFK</div>
+        <div class="watermark">${getWarehouse(Number(selectedOptionsw))}</div>
         <div class="content-row">
           <div class="left-column">${warehouseList?.[0]?.name}</div>
           
@@ -233,7 +255,7 @@ export default function CreateQRCode() {
             Start Warehouse
           </label>
           <div style={{ fontSize: '18px', display: 'flex', gap: '20px' }}>
-              {([17] as const).map((option) => (
+              {([17, 181] as const).map((option) => (
                 <label key={option}>
                   <input
                     type="radio"
