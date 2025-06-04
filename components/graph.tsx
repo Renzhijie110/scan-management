@@ -36,11 +36,12 @@ export default function Graph() {
       const {
         start_warehouse,
         destination_warehouse,
-        total_pallet_count,
-        scan_pallet_count,
-        unscanned_count,
-        date,
+
       } = entry;
+      const total = Number(entry.total_pallet_count);
+      const scanned = Number(entry.scan_pallet_count);
+      const unscanned = Number(entry.unscanned_count);
+
 
       nodesSet.add(start_warehouse);
       nodesSet.add(destination_warehouse);
@@ -49,9 +50,13 @@ export default function Graph() {
         id: index,
         from: start_warehouse,
         to: destination_warehouse,
-        label: `${total_pallet_count} (${date.slice(4, 6)}/${date.slice(6, 8)})`,
-        title: `总数: ${total_pallet_count}\n已扫: ${scan_pallet_count}\n未扫: ${unscanned_count}`,
+        label: `已:${scanned} / 总:${total}`,
+        title: `总数: ${total}\n已扫: ${scanned}\n未扫: ${unscanned}`,
         arrows: 'to',
+        width: Math.max(1, total / 5), // 宽度随总量变化
+        color: {
+          color: scanned === total ? 'green' : scanned === 0 ? 'red' : 'orange',
+        },
       };
     });
 
@@ -71,7 +76,13 @@ export default function Graph() {
       },
       nodes: {
         shape: 'dot',
-        size: 20,
+        size: 25,
+        font: {
+          size: 16,
+          color: '#000',     // 字体颜色
+          face: 'Arial',     // 字体
+          vadjust: -45       // 垂直偏移，可让文字显示在圆点上方或中心（默认在中心）
+        },
       },
       physics: {
         stabilization: true,
