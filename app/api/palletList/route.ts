@@ -12,6 +12,7 @@ export async function GET(request: Request) {
     const data = await sql`
       SELECT * FROM "Pallet"
       Where date = ${date}
+      ORDER BY box_id DESC
     `;
     return NextResponse.json({ data });
   } catch (error) {
