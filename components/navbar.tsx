@@ -30,6 +30,8 @@ export default function Navbar() {
           <div className="hidden sm:flex sm:space-x-8">
             <NavLink href="/create-qrcode" currentPath={pathname} label="Generate QR Code" />
             <NavLink href="/dashboard" currentPath={pathname} label="Dashboard" />
+            <NavLink href="/admin" currentPath={pathname} label="Admin" />
+            <NavLink href="/graph" currentPath={pathname} label="Graph" />
           </div>
 
           {/* 右侧按钮 */}
