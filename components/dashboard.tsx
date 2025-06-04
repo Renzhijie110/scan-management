@@ -75,8 +75,13 @@ export default function Dashboard() {
   
   const totalPages = Math.ceil(filteredBySearch.length / itemsPerPage);
 
-  const startEdit = (index: number) => {
-    setEditingNote({ id: index, comment: dashboard[index].comment || '' });
+  const startEdit = (row: any) => {
+    const index = dashboard.findIndex(item =>
+      item.date === row.date &&
+      item.start_warehouse === row.start_warehouse &&
+      item.destination_warehouse === row.destination_warehouse
+    );
+    setEditingNote({ id: index, comment: dashboard[index]?.comment || '' });
   };
 
   const saveEdit = async () => {
@@ -162,27 +167,32 @@ export default function Dashboard() {
                         {row.unscanned_count}
                       </td>
                       <td style={styles.td}>
-                        {editingNote?.id === globalIndex ? (
-                          <input
-                            value={editingNote.comment}
-                            onChange={(e) =>
-                              setEditingNote({ ...editingNote, comment: e.target.value })
-                            }
-                            style={styles.input}
-                          />
+                      {editingNote && dashboard[editingNote.id]?.date === row.date &&
+                        dashboard[editingNote.id]?.start_warehouse === row.start_warehouse &&
+                        dashboard[editingNote.id]?.destination_warehouse === row.destination_warehouse ? (
+                            <input
+                              value={editingNote.comment}
+                              onChange={(e) =>
+                                setEditingNote({ ...editingNote, comment: e.target.value })
+                              }
+                              style={styles.input}
+                            />
                         ) : (
                           row.comment || ''
                         )}
                       </td>
                       <td style={styles.td}>
-                        {editingNote?.id === globalIndex ? (
+                      {editingNote &&
+                        dashboard[editingNote.id]?.date === row.date &&
+                        dashboard[editingNote.id]?.start_warehouse === row.start_warehouse &&
+                        dashboard[editingNote.id]?.destination_warehouse === row.destination_warehouse ? (
                           <>
                             <button style={styles.btnPrimary} onClick={saveEdit}>保存</button>
                             <button style={styles.btnGray} onClick={() => setEditingNote(null)}>取消</button>
                           </>
-                        ) : (
-                          <button style={styles.btnSoft} onClick={() => startEdit(globalIndex)}>编辑</button>
-                        )}
+                      ) : (
+                          <button style={styles.btnSoft} onClick={() => startEdit(row)}>编辑</button>
+                      )}
                       </td>
                     </tr>
                   );
