@@ -166,7 +166,7 @@ export default function Dashboard() {
                           onClick={() => handleUnscannedClick(row.date,row.start_warehouse,row.destination_warehouse)}>
                         {row.unscanned_count}
                       </td>
-                      <td style={styles.td}>
+                      <td style={{ ...styles.td, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 150 }} >
                       {editingNote && dashboard[editingNote.id]?.date === row.date &&
                         dashboard[editingNote.id]?.start_warehouse === row.start_warehouse &&
                         dashboard[editingNote.id]?.destination_warehouse === row.destination_warehouse ? (
