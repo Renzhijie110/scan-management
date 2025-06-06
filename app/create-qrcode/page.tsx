@@ -40,18 +40,13 @@ export default function CreateQRCode() {
       headers: { "Content-Type": "application/json" },
     });
   };
-  const getWarehouseList = async (warehouseInput: string): Promise<Response> => {
-    return await fetch(`/api/getWarehouseList?warehouseInput=${warehouseInput}`, {
+  const getWarehouseList = async (warehouseInput: string, start_warehouse: string): Promise<Response> => {
+    return await fetch(`/api/getWarehouseList?warehouseInput=${warehouseInput}&start_warehouse=${start_warehouse}`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     });
   };
-  const getWarehouseList_181 = async (warehouseInput: string): Promise<Response> => {
-    return await fetch(`/api/getWarehouseList_181?warehouseInput=${warehouseInput}`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    });
-  };
+
 
   const generateQRCode = async () => {
     if (!selectedOptionsw || !dateInput || !warehouseInput) {
@@ -64,16 +59,10 @@ export default function CreateQRCode() {
       return;
     }
     var list
-    if(selectedOptionsw === 17){
-      const res = await getWarehouseList(warehouseInput);
-      const data = await res.json();
-      list = data.list;
-    }else if(selectedOptionsw === 181){
-      const res = await getWarehouseList_181(warehouseInput);
-      const data = await res.json();
-      list = data.list;
-    }
-    
+    const res = await getWarehouseList(warehouseInput,String(selectedOptionsw));
+    const data = await res.json();
+    list = data.list;
+
     if (list.length === 0) {
       setError("Invalid Warehouse Number");
       return;

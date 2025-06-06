@@ -61,12 +61,6 @@ export default function Dashboard() {
       headers: { "Content-Type": "application/json" },
     });
   };
-  const getWarehouseList_181 = async (warehouseInput: string): Promise<Response> => {
-    return await fetch(`/api/getWarehouseList_181?warehouseInput=${warehouseInput}`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    });
-  };
   const getWarehouse = (input: number) => {
     if(input === 17){
       return "JFK"
