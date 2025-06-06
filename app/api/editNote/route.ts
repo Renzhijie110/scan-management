@@ -8,7 +8,7 @@ export async function POST(request: Request) {
     const id = `${item.date}_${item.start_warehouse}_${item.destination_warehouse}`
 
     await sql`
-    UPDATE "Pallet_Cluster"
+    UPDATE "Pallet_Group"
     SET comment = ${comment}
     WHERE id = ${id}
   `;

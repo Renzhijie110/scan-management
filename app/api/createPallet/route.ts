@@ -11,7 +11,7 @@ export async function POST(request: Request) {
 
     // 先保证 Pallet_Cluster 里有对应记录，避免外键约束失败
     await sql`
-      INSERT INTO "Pallet_Cluster" (id)
+      INSERT INTO "Pallet_Group" (id)
       VALUES (${pallet_group_id})
       ON CONFLICT (id) DO NOTHING
     `;

@@ -14,7 +14,7 @@ export async function GET() {
         COUNT(p.scan_time) AS scan_pallet_count,
         COUNT(*) - COUNT(p.scan_time) AS unscanned_count,
         pc.comment
-      FROM "Pallet_Cluster" pc
+      FROM "Pallet_Group" pc
       LEFT JOIN "Pallet" p ON p.pallet_group_id = pc.id
       GROUP BY pc.id,p.date,p.start_warehouse,p.destination_warehouse, pc.comment
       ORDER BY p.date DESC
