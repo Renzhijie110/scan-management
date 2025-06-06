@@ -55,8 +55,8 @@ export default function Dashboard() {
       setLoading(false);
     }
   };
-  const getWarehouseList = async (warehouseInput: string): Promise<Response> => {
-    return await fetch(`/api/getWarehouseList?warehouseInput=${warehouseInput}`, {
+  const getWarehouseList = async (warehouseInput: string, start_warehouse: string): Promise<Response> => {
+    return await fetch(`/api/getWarehouseList?warehouseInput=${warehouseInput}&start_warehouse=${start_warehouse}`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     });
@@ -91,17 +91,10 @@ export default function Dashboard() {
   const totalPages = Math.ceil(filteredBySearch.length / itemsPerPage);
   const handlePrint = async (item: any) =>  {
     var list: { id: string , name: string}[]
-    if(Number(item.start_warehouse) === 17){
-      const res = await getWarehouseList(item.destination_warehouse);
-      const data = await res.json();
-      list = data.list;
-    }else if(Number(item.start_warehouse) === 181){
-      const res = await getWarehouseList_181(item.destination_warehouse);
-      const data = await res.json();
-      list = data.list;
-    }else{
-      return
-    }
+    const res = await getWarehouseList(item.destination_warehouse,item.start_warehouse);
+    const data = await res.json();
+    list = data.list;
+
 
     const qrImage = await QRCode.toDataURL(item.id);
     try {
