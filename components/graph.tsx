@@ -84,9 +84,7 @@ export default function Graph() {
           vadjust: -45       // 垂直偏移，可让文字显示在圆点上方或中心（默认在中心）
         },
       },
-      physics: {
-        stabilization: true,
-      },
+      physics: false
     };
 
     const network = new Network(containerRef.current!, dataSet, options);
